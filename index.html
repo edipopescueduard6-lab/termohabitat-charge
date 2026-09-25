@@ -772,8 +772,8 @@ div.rfid{cursor:default}
 
 /* ---------- scena 3D a sesiunii ---------- */
 .stage3d{position:relative;height:min(46vh,330px);margin:0 0 4px;overflow:hidden;background:radial-gradient(90% 70% at 50% 60%,var(--stage3d-2) 0%,var(--stage3d-1) 100%)}
-.stage3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;opacity:0;transition:opacity .6s ease}
-.stage3d.ready canvas{opacity:1}
+
+
 .stage3d .s3-fallback{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);transition:opacity .4s}
 .stage3d.ready .s3-fallback{opacity:0}
 .stage3d .s3-fallback .ic{width:72px;height:72px;stroke-width:1.2;opacity:.5}
@@ -783,8 +783,8 @@ div.rfid{cursor:default}
 @keyframes s3ring{0%{transform:scale(.4);opacity:.7}100%{transform:scale(2.2);opacity:0}}
 .stage3d.ready .s3-energy{display:none}
 .stage3d .s3-top{position:absolute;z-index:2;left:12px;top:10px;display:flex;gap:6px}
-.stage3d .s3-drag{position:absolute;z-index:2;right:12px;bottom:10px;display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);background:color-mix(in srgb,var(--surface) 70%,transparent);padding:3px 8px;border-radius:10px;opacity:0;transition:opacity .4s}
-.stage3d.ready .s3-drag{opacity:1;animation:hintOut 1s ease 4s forwards}
+
+
 @keyframes hintOut{to{opacity:0}}
 .live-read{display:flex;justify-content:space-between;align-items:flex-end;padding:6px 16px 8px}
 .live-read .kw{display:flex;align-items:baseline;font:700 50px/.95 var(--f-round);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
@@ -801,8 +801,8 @@ div.rfid{cursor:default}
 p.hint{display:flex;align-items:flex-start;gap:7px;font-size:12.5px;color:var(--muted);margin-top:4px}
 p.hint:empty{display:none}
 .v3d{position:relative;height:230px;border-radius:14px;overflow:hidden;background:radial-gradient(90% 70% at 50% 60%,var(--stage3d-2) 0%,var(--stage3d-1) 100%)}
-.v3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;opacity:0;transition:opacity .6s}
-.v3d.ready canvas{opacity:1}
+
+
 /* ecran de pornire: logo care „se încarcă” */
 .boot{position:fixed;inset:0;z-index:200;display:grid;place-items:center;background:var(--bg);transition:opacity .45s ease,visibility .45s}
 .boot.out{opacity:0;visibility:hidden}
@@ -815,8 +815,8 @@ p.hint:empty{display:none}
 .boot .bb i{display:block;height:100%;width:0;background:var(--brand);animation:bootBar 1.1s ease forwards}
 @keyframes bootBar{to{width:100%}}
 .onb-3d{position:relative;height:200px;margin:-10px -24px 0;display:grid;place-items:center start;padding-left:24px}
-.onb-3d canvas{position:absolute;inset:0;width:100%!important;height:100%!important;opacity:0;transition:opacity .8s}
-.onb-3d.ready canvas{opacity:1}
+
+
 .onb-3d.ready .onb-icon{position:absolute;left:24px;top:0;width:52px;height:52px;border-radius:14px;box-shadow:none}
 .onb-3d.ready .onb-icon>div{width:36px!important}
 .veh .v-ic.live-ring{box-shadow:inset 0 0 0 2px var(--brand)}
@@ -866,8 +866,52 @@ p.hint:empty{display:none}
 .dyn.done .dx-soc b{color:#6FA8FF}.dyn.fee .dx-soc b{color:#FFB547}
 @media (prefers-reduced-motion:reduce){.dyn{transition:none}.dyn-l .ic{animation:none}}
 
+/* ---------- vehiculul din fotografie (fără 3D) ----------
+   Imaginea reală, decupată, pe un sol cu umbră moale; la încărcare, stâlpul, cablul și energia sunt desenate peste. */
+.vstage{--ph:#8BE04E;--pw:.6;overflow:hidden}
+.vstage .vs-img{position:absolute;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none;opacity:0;transform:translateY(10px) scale(.985);transition:opacity .6s ease,transform .8s var(--ease-out);filter:drop-shadow(0 10px 14px rgb(0 0 0 / .12))}
+.vstage.ready .vs-img{opacity:1;transform:none}
+.vstage .vs-shadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgb(0 0 0 / .34),rgb(0 0 0 / .14) 55%,transparent);filter:blur(3px);pointer-events:none}
+.vstage .vs-floor{position:absolute;height:0;pointer-events:none}
+.vstage .vs-floor i{position:absolute;left:-50%;top:-12px;width:100%;height:24px;border-radius:50%;border:2px solid var(--ph);opacity:0}
+.vstage.vs-charging[data-phase="charging"] .vs-floor i,.vstage.vs-charging[data-phase="tapering"] .vs-floor i,.vstage.vs-charging[data-phase="preparing"] .vs-floor i{animation:vsRing 2.6s ease-out infinite}
+.vstage .vs-floor i:nth-child(2){animation-delay:.87s!important}.vstage .vs-floor i:nth-child(3){animation-delay:1.74s!important}
+@keyframes vsRing{0%{transform:scale(.55);opacity:calc(var(--pw) * .75)}100%{transform:scale(1.25,1.45);opacity:0}}
+.vstage .vs-fx{position:absolute;inset:0;overflow:visible;pointer-events:none}
+.vstage.vs-showcase .vs-fx,.vstage.vs-showcase .vs-port,.vstage.vs-showcase .vs-floor{display:none}
+.vstage .vs-cable{fill:none;stroke:#1A1D1A;stroke-width:4.2;stroke-linecap:round}
+.vstage .vs-flow{fill:none;stroke:var(--ph);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:2 11;opacity:.9;animation:vsFlow .9s linear infinite}
+.vstage[data-phase="done"] .vs-flow{animation:none;opacity:.35}
+@keyframes vsFlow{to{stroke-dashoffset:-13}}
+.vstage .vs-dots circle{fill:var(--ph)}
+.vstage .vs-screen,.vstage .vs-stripe{fill:var(--ph);transition:fill .6s}
+.vstage .vs-screen{animation:vsScreen 2.4s ease-in-out infinite}
+@keyframes vsScreen{50%{opacity:.72}}
+.vstage .vs-port{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:radial-gradient(closest-side,#fff 0,var(--ph) 35%,transparent 72%);mix-blend-mode:screen;animation:vsPort 1.1s ease-in-out infinite;pointer-events:none}
+.vstage[data-phase="done"] .vs-port{animation-duration:2.6s;opacity:.7}
+.vstage[data-phase="preparing"] .vs-port{animation-duration:.6s}
+@keyframes vsPort{50%{transform:scale(.62);opacity:.55}}
+.vstage.failed .vs-img{display:none}
+.stage3d.ready .s3-fallback{opacity:0}
+.v3d.vstage{background:radial-gradient(90% 70% at 50% 62%,var(--stage3d-2) 0%,var(--stage3d-1) 100%)}
+.onb-3d.vstage{overflow:visible}
+.vthumb{width:100%;height:100%;object-fit:contain}
+.veh .v-ic.pic{width:70px;height:44px;background:transparent}
+.veh .v-ic.pic .vthumb{padding:3px;filter:drop-shadow(0 3px 4px rgb(0 0 0 / .18))}
+.dyn-x .dx-pic .vthumb{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:contain;background:transparent}
+@media (prefers-reduced-motion:reduce){.vstage .vs-flow,.vstage .vs-port,.vstage .vs-screen,.vstage .vs-floor i{animation:none!important}}
+/* deschidere: TIR în spate, mașină în față, cu umbre moi și intrare animată */
+.onb-hero{height:220px!important;margin:-6px -24px 0!important;position:relative}
+.onb-hero .oh{position:absolute;bottom:14px;height:auto;opacity:0;filter:drop-shadow(0 12px 12px rgb(0 0 0 / .16));transition:opacity .7s ease,transform 1s var(--ease-out);pointer-events:none}
+.onb-hero .oh-truck{right:2%;height:176px;width:auto;max-width:58%;object-fit:contain;object-position:right bottom;bottom:34px;transform:translateX(40px)}
+.onb-hero .oh-car{left:3%;height:128px;width:auto;max-width:66%;object-fit:contain;object-position:left bottom;transform:translateX(-40px)}
+.onb-hero .oh.in{opacity:1;transform:none}
+.onb-hero .oh-truck.in{transition-delay:.15s}
+.onb-hero::after{content:"";position:absolute;left:8%;right:8%;bottom:4px;height:28px;border-radius:50%;background:radial-gradient(closest-side,rgb(0 0 0 / .18),transparent);pointer-events:none}
+.onb-hero.ready .onb-icon{position:absolute;left:24px;top:0;width:52px;height:52px;border-radius:14px;box-shadow:none;z-index:2}
+.onb-hero.ready .onb-icon>div{width:36px!important}
+
 </style>
-<script type="importmap">{"imports": {"three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/"}}</script>
 </head>
 <body>
 <div class="boot" id="boot" aria-hidden="true"><div><div class="bm"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="42.13" fill="none" stroke="var(--text)" stroke-width="15.74"/><path d="M70.51,73.82 L29.17,73.71 L28.70,73.14 L28.70,48.27 L28.54,48.01 L19.10,48.01 L18.57,47.80 L18.21,47.22 L18.21,46.80 L18.57,46.22 L49.74,18.42 L50.26,18.42 L50.89,18.84 L80.59,45.49 L81.79,46.80 L81.69,47.43 L80.90,48.01 L71.46,48.01 L71.30,48.16 L71.30,73.03 L71.09,73.45 L70.51,73.82Z" fill="var(--fill)"/><path class="fillhouse" d="M70.51,73.82 L29.17,73.71 L28.70,73.14 L28.70,48.27 L28.54,48.01 L19.10,48.01 L18.57,47.80 L18.21,47.22 L18.21,46.80 L18.57,46.22 L49.74,18.42 L50.26,18.42 L50.89,18.84 L80.59,45.49 L81.79,46.80 L81.69,47.43 L80.90,48.01 L71.46,48.01 L71.30,48.16 L71.30,73.03 L71.09,73.45 L70.51,73.82Z" fill="#72BF44"/></svg></div><div class="bt">Termohabitat Charge</div><div class="bb"><i></i></div></div></div>
@@ -1136,24 +1180,208 @@ function buildWorld() {
 <script>
 /* Date EXEMPLU pentru prototip — stații, tarife, flotă, carduri. Nu sunt date reale de exploatare.
    Codul de operator TMH e provizoriu (România nu are încă organism de înregistrare a ID-urilor eMobility). */
-/* modele 3D (licențe în CREDITS / ecranul Despre). Orientare canonică: fața spre +z. */
-const MODELS3D = {
-  suv: { url: 'models/suv.glb', length: 4.75, paint: '#3E444B', paintMats: ['pintura'], glassMats: ['vidro'], port: [0.49, 0.56, -0.4], credit: '„2021 Tesla Model Y” de tonielpro520 (Sketchfab), CC BY 4.0' },
-  concept: { url: 'models/concept.glb', length: 4.6, port: [0.5, 0.5, -0.38], credit: '„Car Concept” de Eric Chadwick, © 2024 Darmstadt Graphics Group GmbH, CC BY 4.0 (după Concept Car 004 de Unity Fan, CC0)' },
-  van: { url: 'models/sprinter.glb', length: 5.93, paint: '#E8EBE7', paintMats: ['body_paint'], metal: 0.25, rough: 0.35, glassMats: ['glass'], port: [0.5, 0.42, 0.42], credit: '„Mercedes Sprinter” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
-  atto3: { url: 'models/atto3.glb', length: 4.455, paint: '#8FB6CB', paintMats: ['paint'], metal: 0.45, port: [-0.5, 0.56, -0.36], credit: '„2024 BYD Atto 3 Superior Extended Range” de Nazh Design (Sketchfab), CC BY 4.0' },
-  q8: { url: 'models/q8.glb', length: 4.9, paint: '#2F3B47', paintMats: ['body_paint'], glassMats: ['glass'], hideMats: ['license_plate'], port: [0.5, 0.6, 0.33], credit: '„Audi e-tron” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
-  /* camioane: cap tractor + semiremorcă de 13,6 m (ansamblu TIR); priza CCS/MCS pe stânga, în spatele cabinei */
-  trailer: { url: 'models/trailer.glb', length: 13.6, rotY: Math.PI, plainMats: ['The_texture_of_the_trailer', 'paint_trailer.001'], credit: '„Semi Trailer” de NoblecatSoft (Sketchfab), CC BY 4.0' },
-  tirMan: { url: 'models/tractor_man.glb', length: 6.1, rotY: Math.PI / 2, hide: ['ee', 'ee_1', 'TextPlus001', 'TextPlus001_1', 'TextPlus001_2', 'TextPlus001_3', 'TextPlus001_4', 'Box001', 'Box002', 'Box003'], paint: '#E6E9EB', paintMats: ['tgx_paint'], metal: 0.5, rough: 0.28, glassMats: ['glass'], matColors: { Seats: ['#3b3f43', 0, 0.8], Metal: ['#c3c8cc', 0.9, 0.25], Plastic: ['#2b2f33', 0, 0.6], Black: ['#141618', 0.1, 0.5], Aluminum: ['#d2d6d9', 0.9, 0.2], Tire: ['#1a1a1a', 0, 0.9], Mirror: ['#e6e9ec', 1, 0.05], Interior_Texture: ['#44484c', 0, 0.8], Interior_Buttons: ['#2f3336', 0, 0.6], Interior_White: ['#cfd3d5', 0, 0.7], Interior_Base: ['#3a3e42', 0, 0.8], Material_30: ['#2b2f33', 0.2, 0.6], Material_40: ['#b8bdc1', 0.6, 0.35] }, port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.1 }, credit: '„TIR Silver V1” (MAN TGX) de mateusz.swierkowski (Sketchfab), CC BY 4.0' },
-  tirDaf: { url: 'models/tractor_eu.glb', length: 5.95, rotY: 0, hide: ['Text', 'Text.001'], paint: '#27313C', paintMats: ['body'], metal: 0.5, glassMats: ['window'], port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.05 }, credit: '„[XYZ] KR Scania R_Draft” de radzig541 (Sketchfab), CC BY 4.0 — cabină fără însemne, ca DAF XF' },
-  tirMerc: { url: 'models/tractor_merc.glb', length: 6.9, rotY: Math.PI, paint: '#DADDE0', paintMats: ['body_paint'], metal: 0.4, port: [0.5, 0.33, -0.1], attach: { model: 'trailer', front: 3.1 }, credit: '„European HGV tractor” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
-  tirVolvo: { url: 'models/tractor_eu.glb', length: 5.95, rotY: 0, hide: ['Text', 'Text.001'], paint: '#2F6EA8', paintMats: ['body'], metal: 0.5, glassMats: ['window'], port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.05 }, credit: '„[XYZ] KR Scania R_Draft” de radzig541 (Sketchfab), CC BY 4.0 — cabină fără însemne, ca Volvo FH' },
-  compact: { url: 'models/spring.glb', length: 3.73, paint: '#8A9B7E', paintMats: ['body_paint'], metal: 0.35, glassMats: ['glass'], port: [0.14, 0.5, 0.49], credit: '„2011 Dacia (Renault) Duster” de razor24 (Sketchfab), CC BY 4.0 — la scara unei Dacia Spring' },
-  crossover: { url: 'models/puma.glb', length: 4.21, paint: '#B8322E', paintMats: ['body_paint'], glassMats: ['glass'], port: [0.5, 0.56, -0.37], credit: '„2017 Mini Countryman” de razor24 (Sketchfab), CC BY 4.0 — siluetă de crossover compact' },
-  ix2: { url: 'models/ix2.glb', length: 4.55, paint: '#1E4F9A', paintMats: ['body_paint'], glassMats: ['glass'], port: [-0.5, 0.56, -0.37], credit: '„Lowpoly Generic SUV” de mk2design (Sketchfab), CC BY 4.0 — siluetă de SUV coupé' },
+/* fotografiile vehiculelor (Wikimedia Commons, decupate) — generat de _assets/photos_build.py */
+const PHOTOS = {
+ "model-y": {
+  "src": "img/v/model-y.webp",
+  "thumb": "img/v/model-y-s.webp",
+  "w": 1200,
+  "h": 634,
+  "facing": "left",
+  "port": [
+   94.7,
+   29.6
+  ],
+  "focus": 1,
+  "title": "Tesla Model Y Premium (Facelift) – f 05052026",
+  "author": "© M 93",
+  "license": "CC BY-SA 3.0 de",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+  "page": "https://commons.wikimedia.org/wiki/File:Tesla_Model_Y_Premium_(Facelift)_%E2%80%93_f_05052026.jpg",
+  "exact": "Tesla Model Y 2025+ 'Juniper' facelift, Premium trim, Pearl White with aero wheel covers; full-width front light bar, German car with blank plate carrier (photo 05.05.2026)"
+ },
+ "puma": {
+  "src": "img/v/puma.webp",
+  "thumb": "img/v/puma-s.webp",
+  "w": 1200,
+  "h": 668,
+  "facing": "left",
+  "port": [
+   94.1,
+   33.9
+  ],
+  "focus": 1,
+  "title": "Ford Puma Gen-E IMG 3836",
+  "author": "Alexander-93",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Ford_Puma_Gen-E_IMG_3836.jpg",
+  "exact": "Ford Puma Gen-E (2025, battery-electric), white with black roof and black 18in aero wheels, closed body-colour grille panel with Ford oval; German dealer registration (Autohaus Bolz Böblingen), photo 03.08.2025"
+ },
+ "spring": {
+  "src": "img/v/spring.webp",
+  "thumb": "img/v/spring-s.webp",
+  "w": 1200,
+  "h": 800,
+  "facing": "left",
+  "port": [
+   18.4,
+   59.4
+  ],
+  "focus": 1,
+  "title": "Dacia Spring (Facelift) – f 08022026",
+  "author": "© M 93",
+  "license": "CC BY-SA 3.0 de",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+  "page": "https://commons.wikimedia.org/wiki/File:Dacia_Spring_(Facelift)_%E2%80%93_f_08022026.jpg",
+  "exact": "Dacia Spring 2024 facelift (new design with the DC logo light bar, square headlamps and black cladding), silver, base trim with steel wheels and hubcaps; German dealer car, blank plate (photo 08.02.2026)"
+ },
+ "atto3": {
+  "src": "img/v/atto3.webp",
+  "thumb": "img/v/atto3-s.webp",
+  "w": 1200,
+  "h": 633,
+  "facing": "left",
+  "port": [
+   86,
+   37
+  ],
+  "focus": 1,
+  "title": "BYD Atto 3 1X7A6491",
+  "author": "Alexander Migl",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:BYD_Atto_3_1X7A6491.jpg",
+  "exact": "BYD Atto 3 (Yuan Plus), pre-Evo, current generation, silver-white compact SUV, German registration M-HW 3344E, BYD front bar and 'BYD Design' badge on the front wing"
+ },
+ "q8": {
+  "src": "img/v/q8.webp",
+  "thumb": "img/v/q8-s.webp",
+  "w": 1200,
+  "h": 616,
+  "facing": "left",
+  "port": [
+   27,
+   43
+  ],
+  "focus": 1,
+  "title": "Audi Q8 e-tron IAA 2023 1X7A0616",
+  "author": "Alexander-93",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Audi_Q8_e-tron_IAA_2023_1X7A0616.jpg",
+  "exact": "Audi Q8 e-tron (2023+ facelift of the e-tron GE), SUV body (not Sportback), S line with black styling package, red, black wheels, German plate IN-EP 702E; IAA Mobility 2023 test-drive car, Munich, 2023-09-05"
+ },
+ "ix2": {
+  "src": "img/v/ix2.webp",
+  "thumb": "img/v/ix2-s.webp",
+  "w": 1200,
+  "h": 635,
+  "facing": "left",
+  "port": [
+   91.9,
+   35.4
+  ],
+  "focus": 1,
+  "title": "BMW iX2 xDrive30 1X7A1971",
+  "author": "Alexander-93",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:BMW_iX2_xDrive30_1X7A1971.jpg",
+  "exact": "BMW iX2 xDrive30 M Sport (U10, 2024+), the electric coupe-SUV, black, German plate M-AL 9597E; photographed Stuttgart-Vaihingen 2024-02-18"
+ },
+ "etransit": {
+  "src": "img/v/etransit.webp",
+  "thumb": "img/v/etransit-s.webp",
+  "w": 1200,
+  "h": 822,
+  "facing": "left",
+  "port": [
+   17,
+   72
+  ],
+  "focus": 1,
+  "title": "Amazon Prime van - 7 July 2025",
+  "author": "Aethonatic",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "page": "https://commons.wikimedia.org/wiki/File:Amazon_Prime_van_-_7_July_2025.jpg",
+  "exact": "Mercedes-Benz eSprinter panel van, current generation (2023+ eSprinter on the facelifted VS30 Sprinter body), high roof, right-hand-drive UK van in dark grey Amazon Prime livery with a '100% Electric' decal and a green-flash zero-emission plate KW74 BMY (registered Sept 2024 to Feb 2025). Photographed in Derby on 2025-07-07. Filed on Commons in Category:Mercedes-Benz eSprinter."
+ },
+ "eactros": {
+  "src": "img/v/eactros.webp",
+  "thumb": "img/v/eactros-s.webp",
+  "w": 1200,
+  "h": 949,
+  "facing": "left",
+  "port": [
+   77,
+   76
+  ],
+  "focus": 1,
+  "title": "Mercedes-Benz eActros 600 130 Years Trucks Edition IAA Transportation 2026 (DSC7781)",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:Mercedes-Benz_eActros_600_130_Years_Trucks_Edition_IAA_Transportation_2026_(DSC7781).jpg",
+  "exact": "Mercedes-Benz eActros 600 4x2 semi-trailer tractor (ProCabin GigaSpace), '130 Years Trucks Edition' in silver with red wheel-arch and side-panel accents, shown at IAA Transportation 2026 in Hanover. The '600' door badge, eActros grille script and 'eACTROS' plate are visible."
+ },
+ "etgx": {
+  "src": "img/v/etgx.webp",
+  "thumb": "img/v/etgx-s.webp",
+  "w": 1200,
+  "h": 1119,
+  "facing": "right",
+  "port": [
+   28,
+   77
+  ],
+  "focus": 1,
+  "title": "MAN eTGX 20.600 IAA Transportation 2026 (DSC8371)",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "page": "https://commons.wikimedia.org/wiki/File:MAN_eTGX_20.600_IAA_Transportation_2026_(DSC8371).jpg",
+  "exact": "MAN eTGX 20.600 4x2 tractor unit, current TGX GX cab (2024+ eTGX series), blue 'INDIVIDUAL' sun visor, IAA Transportation 2026. Door badge 'eTGX 20.600', plate 'New MAN eTGX'. Solo tractor with no semi-trailer."
+ },
+ "fh": {
+  "src": "img/v/fh.webp",
+  "thumb": "img/v/fh-s.webp",
+  "w": 1200,
+  "h": 903,
+  "facing": "left",
+  "port": [
+   62,
+   76
+  ],
+  "focus": 1,
+  "title": "Nufam 2023, Rheinstetten (P1130827)",
+  "author": "Matti Blume",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "page": "https://commons.wikimedia.org/wiki/File:Nufam_2023,_Rheinstetten_(P1130827).jpg",
+  "exact": "Volvo FH Electric (2021+ FH cab, 4x2 tractor unit; grille badges 'ELECTRIC' and 'FH'; Commons categories 'Volvo FH (2021)' and 'Volvo FH Electric'), coupled to a Krone tri-axle reefer semi-trailer with TIP Trailer Services livery. This is the allowed fallback, not the FH Aero Electric."
+ },
+ "daf": {
+  "src": "img/v/daf.webp",
+  "thumb": "img/v/daf-s.webp",
+  "w": 1200,
+  "h": 915,
+  "facing": "right",
+  "port": [
+   38,
+   80
+  ],
+  "focus": 1,
+  "title": "DAF XF 350 Electric IAA Transportation 2024 (DSC03486)",
+  "author": "MarcelX42",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "page": "https://commons.wikimedia.org/wiki/File:DAF_XF_350_Electric_IAA_Transportation_2024_(DSC03486).jpg",
+  "exact": "DAF XF 350 Electric (new-generation XF, 2022+; 'ELECTRIC' badges, blue grille accents, battery side boxes instead of fuel tanks), 4x2 tractor unit, solo without trailer, white, IAA Transportation 2024"
+ }
 };
-window.CAR3D_MODELS = MODELS3D;
+
 const DATA = {
   company: { name: 'Termohabitat S.R.L.', cui: '30688468', email: 'office@termohabitat.ro', hq: 'Str. Antreprenorilor 16–18, Pătrăuți, jud. Suceava' },
   tariff: {
@@ -1282,27 +1510,27 @@ const DATA = {
   ],
   /* curbele de încărcare sunt modelate (nu măsurate) */
   vehicles: [
-    { id: 'model-y', model3d: 'suv', kind: 'car', name: 'Tesla Model Y Long Range', plate: 'SV 41 RFR', batt: 75, maxDc: 250, maxAc: 11, soc: 10, driver: 'Adriana', center: 'Vânzări', range: 530,
+    { id: 'model-y', kind: 'car', name: 'Tesla Model Y Long Range', plate: 'SV 41 RFR', batt: 75, maxDc: 250, maxAc: 11, soc: 10, driver: 'Adriana', center: 'Vânzări', range: 530,
       curve: [[0, 232], [10, 245], [13, 250], [18, 250], [25, 214], [35, 177], [51, 123], [63, 94], [73, 76], [80, 62], [90, 38], [100, 12]] },
-    { id: 'puma', model3d: 'crossover', kind: 'car', name: 'Ford Puma Gen-E', plate: 'SV 42 RFR', batt: 43, maxDc: 100, maxAc: 11, soc: 64, driver: 'Ioana', center: 'Vânzări', range: 370,
+    { id: 'puma', kind: 'car', name: 'Ford Puma Gen-E', plate: 'SV 42 RFR', batt: 43, maxDc: 100, maxAc: 11, soc: 64, driver: 'Ioana', center: 'Vânzări', range: 370,
       curve: [[0, 98], [40, 100], [60, 80], [80, 55], [100, 15]] },
-    { id: 'spring', model3d: 'compact', kind: 'car', name: 'Dacia Spring', plate: 'SV 43 RFR', batt: 24.3, maxDc: 40, maxAc: 7, soc: 71, driver: 'Andrei', center: 'Service', range: 220,
+    { id: 'spring', kind: 'car', name: 'Dacia Spring', plate: 'SV 43 RFR', batt: 24.3, maxDc: 40, maxAc: 7, soc: 71, driver: 'Andrei', center: 'Service', range: 220,
       curve: [[0, 38], [60, 38], [80, 30], [100, 8]] },
-    { id: 'atto3', model3d: 'atto3', kind: 'car', name: 'BYD Atto 3', plate: 'SV 44 RFR', batt: 60.5, maxDc: 88, maxAc: 11, soc: 58, driver: 'Cristina', center: 'Vânzări', range: 420,
+    { id: 'atto3', kind: 'car', name: 'BYD Atto 3', plate: 'SV 44 RFR', batt: 60.5, maxDc: 88, maxAc: 11, soc: 58, driver: 'Cristina', center: 'Vânzări', range: 420,
       curve: [[0, 86], [30, 88], [50, 80], [70, 60], [85, 40], [100, 10]] },
-    { id: 'q8', model3d: 'q8', kind: 'car', name: 'Audi Q8 e-tron 55', plate: 'SV 45 RFR', batt: 106, maxDc: 170, maxAc: 11, soc: 46, driver: 'Radu', center: 'Vânzări', range: 560,
+    { id: 'q8', kind: 'car', name: 'Audi Q8 e-tron 55', plate: 'SV 45 RFR', batt: 106, maxDc: 170, maxAc: 11, soc: 46, driver: 'Radu', center: 'Vânzări', range: 560,
       curve: [[0, 168], [60, 170], [70, 150], [80, 120], [90, 70], [100, 15]] },
-    { id: 'ix2', model3d: 'ix2', kind: 'car', name: 'BMW iX2 eDrive20', plate: 'SV 46 RFR', batt: 64.8, maxDc: 130, maxAc: 11, soc: 67, driver: 'Sorin', center: 'Vânzări', range: 470,
+    { id: 'ix2', kind: 'car', name: 'BMW iX2 eDrive20', plate: 'SV 46 RFR', batt: 64.8, maxDc: 130, maxAc: 11, soc: 67, driver: 'Sorin', center: 'Vânzări', range: 470,
       curve: [[0, 128], [35, 130], [55, 110], [75, 75], [90, 45], [100, 12]] },
-    { id: 'etransit', model3d: 'van', kind: 'van', name: 'Mercedes-Benz eSprinter', plate: 'SV 31 RFR', batt: 113, maxDc: 115, maxAc: 11, soc: 52, driver: 'Mihai', center: 'Distribuție', range: 440,
+    { id: 'etransit', kind: 'van', name: 'Mercedes-Benz eSprinter', plate: 'SV 31 RFR', batt: 113, maxDc: 115, maxAc: 11, soc: 52, driver: 'Mihai', center: 'Distribuție', range: 440,
       curve: [[0, 112], [45, 115], [60, 100], [80, 70], [100, 18]] },
-    { id: 'eactros', model3d: 'tirMerc', kind: 'truck', name: 'Mercedes-Benz eActros 600', plate: 'SV 21 RFR', batt: 621, maxDc: 400, maxMcs: 0, mcsSoon: true, maxAc: 22, soc: 38, driver: 'Vasile', center: 'Transport internațional', range: 500,
+    { id: 'eactros', kind: 'truck', name: 'Mercedes-Benz eActros 600', plate: 'SV 21 RFR', batt: 621, maxDc: 400, maxMcs: 0, mcsSoon: true, maxAc: 22, soc: 38, driver: 'Vasile', center: 'Transport internațional', range: 500,
       curve: [[0, 396], [75, 396], [85, 300], [100, 80]] },
-    { id: 'etgx', model3d: 'tirMan', kind: 'truck', name: 'MAN eTGX 6×2', plate: 'SV 22 RFR', batt: 616, maxDc: 375, maxMcs: 750, maxAc: 22, soc: 40, driver: 'Gheorghe', center: 'Transport internațional', range: 590,
+    { id: 'etgx', kind: 'truck', name: 'MAN eTGX 4×2', plate: 'SV 22 RFR', batt: 616, maxDc: 375, maxMcs: 750, maxAc: 22, soc: 40, driver: 'Gheorghe', center: 'Transport internațional', range: 590,
       curve: [[0, 730], [60, 702], [68, 599], [76, 493], [80, 430], [90, 290], [100, 90]] },
-    { id: 'fh', model3d: 'tirVolvo', kind: 'truck', name: 'Volvo FH Aero Electric', plate: 'SV 23 RFR', batt: 780, maxDc: 350, maxMcs: 700, maxAc: 43, soc: 81, driver: 'Ionuț', center: 'Transport internațional', range: 600,
+    { id: 'fh', kind: 'truck', name: 'Volvo FH Electric', plate: 'SV 23 RFR', batt: 780, maxDc: 350, maxMcs: 700, maxAc: 43, soc: 81, driver: 'Ionuț', center: 'Transport internațional', range: 600,
       curve: [[0, 700], [55, 690], [70, 560], [80, 450], [100, 120]] },
-    { id: 'daf', model3d: 'tirDaf', kind: 'truck', name: 'DAF XF Electric', plate: 'SV 24 RFR', batt: 525, maxDc: 325, maxMcs: 0, maxAc: 22, soc: 27, driver: 'Florin', center: 'Distribuție', range: 500,
+    { id: 'daf', kind: 'truck', name: 'DAF XF Electric', plate: 'SV 24 RFR', batt: 525, maxDc: 325, maxMcs: 0, maxAc: 22, soc: 27, driver: 'Florin', center: 'Distribuție', range: 500,
       curve: [[0, 322], [70, 318], [85, 220], [100, 80]] },
   ],
   fleet: {
@@ -1567,13 +1795,6 @@ function stagger(el) {
 }
 function shadeUpdate() { const sh = $('#sbshade'), el = curScr(); if (!sh) return; sh.classList.toggle('on', !!el && !el.classList.contains('lock') && el.scrollTop > 4); }
 function unmountScreen() { if (S.unmount) { try { S.unmount(); } catch (e) { /* ignorat */ } S.unmount = null; } }
-/* montează o scenă 3D când modulul e gata; întoarce funcția de demontare */
-function with3D(fn) {
-  let hd = null, dead = false;
-  const go = () => { if (!dead && window.Car3D) hd = fn(window.Car3D); };
-  if (window.Car3D) go(); else window.addEventListener('car3d-ready', go, { once: true });
-  return { get h() { return hd; }, stop() { dead = true; if (hd) hd.destroy(); } };
-}
 function render(anim = 'fade', restore = anim === 'pop') {
   closeModal(false);
   unmountScreen();
@@ -1629,7 +1850,7 @@ const TRUCK = { nu: 'Nu', rigid: 'Rigid ≤12' + NB + 'm', articulat: 'Articulat
 const WINDOWS = { oricand: 'Oricând', zi: '06:00–22:00', noapte: 'Doar noaptea', program: 'L–V 07:00–19:00' };
 const isTruckSt = st => !!st.truck && st.truck.level !== 'nu';
 /* miniatura randată a vehiculului (sau iconița, dacă nu există model 3D) */
-const vehPic = (v, live) => v.model3d ? `<span class="v-ic pic${live ? ' live-ring' : ''}"><img src="${window.ASSET_BASE || ''}img/veh-${v.model3d}.png" alt="" loading="lazy" onerror="this.remove()"></span>` : `<span class="v-ic${live ? ' live' : ''}">${ic(VKIND[v.kind][0], 's26')}</span>`;
+const vehPic = (v, live) => photoOf(v) ? `<span class="v-ic pic${live ? ' live-ring' : ''}">${vehThumb(v)}</span>` : `<span class="v-ic${live ? ' live' : ''}">${ic(VKIND[v.kind][0], 's26')}</span>`;
 const DRIVERS = { Sorin: 'Sorin Luca', Cristina: 'Cristina Popa', Radu: 'Radu Iacob', Adriana: 'Adriana Munteanu', Vasile: 'Vasile Rusu', Gheorghe: 'Gheorghe Pavel', 'Ionuț': 'Ionuț Hreniuc', Florin: 'Florin Ciobanu', Mihai: 'Mihai Lungu', Ioana: 'Ioana Rotaru', Andrei: 'Andrei Onu' };
 let uid = 0;
 function topbar(title, o = {}) {
@@ -1802,7 +2023,16 @@ const SCREENS = {};
 /* ---- Bun venit ---- */
 SCREENS.bunvenit = {
   tabs: false, cls: 'flush lock',
-  mount(el) { const host = el.querySelector('#onb3d'); const w = with3D(api => api.mount(host, { model: 'concept', mode: 'showcase', onReady() { host.classList.add('ready'); } })); S.unmount = () => w.stop(); },
+  /* compoziție de deschidere: un TIR în spate, o mașină în față (fotografii reale) */
+  mount(el) {
+    const host = el.querySelector('#onb3d'), pick = ids => ids.map(vehicle).find(photoOf);
+    const car = pick(['spring', 'model-y', 'atto3', 'q8']), truck = pick(['eactros', 'fh', 'etgx', 'daf']);
+    if (!car && !truck) return;
+    host.classList.add('onb-hero');
+    host.insertAdjacentHTML('beforeend', [truck && `<img class="oh oh-truck" src="${photoUrl(photoOf(truck))}" alt="" data-facing="${photoOf(truck).facing}">`, car && `<img class="oh oh-car" src="${photoUrl(photoOf(car))}" alt="" data-facing="${photoOf(car).facing}">`].filter(Boolean).join(''));
+    host.querySelectorAll('img.oh').forEach(i => i.addEventListener('load', () => i.classList.add('in'), { once: true }));
+    host.classList.add('ready');
+  },
   html: () => `<div class="onb">
     <div class="onb-top">
       <div class="onb-deco">${mark('currentColor', 'currentColor')}</div>
@@ -2123,10 +2353,9 @@ SCREENS.sesiune = {
     const pay = s.guest ? { icon: 'cards', label: 'Plată fără cont', sub: `card bancar · +${nf(T.guestExtra, 2)} lei/kWh` } : (byId(DATA.payments, s.pay) || DATA.payments[0]);
     const nowB = effBand(s.cls, band(new Date(s.start + s.t * 1000)));
     return `${topbar(st.name, { close: true, right: `<button class="iconbtn flat" data-act="report" aria-label="Ajutor la stație">${ic('help', 's20')}</button>` })}
-    <div class="stage3d" id="stage3d" data-model="${v.model3d || ''}">
+    <div class="stage3d" id="stage3d">
       <div class="s3-fallback" aria-hidden="true"><div class="s3-energy"><i></i><i></i><i></i></div>${ic(VKIND[v.kind][0], 's32')}</div>
       <div class="s3-top" data-live="status">${liveStatus(s)}</div>
-      <div class="s3-drag" aria-hidden="true">${ic('arrowsH', 's16')}Rotește</div>
     </div>
     <div class="live-read">
       <div class="lr-kw"><span class="kw" aria-label="Putere acum"><span data-live="kwbig">${Math.floor(s.kw)}</span><span class="kw-dec" data-live="kwdec">,${Math.floor((s.kw % 1) * 10)}</span></span><span class="kw-u">kW acum</span></div>
@@ -2149,8 +2378,8 @@ SCREENS.sesiune = {
     bindSlider(el, 'stopSlide', stopSession);
     const host = el.querySelector('#stage3d'); if (!host || !S.session) return;
     const v = vehicle(S.session.veh);
-    const w = with3D(api => api.mount(host, { model: v.model3d, mode: 'charging', onError() { host.classList.add('failed'); } }));
-    S.stage3d = w; S.unmount = () => { w.stop(); S.stage3d = null; };
+    const st = vStage(host, v, { mode: 'charging' }); st.update({ kw: S.session.kw, soc: S.session.soc, phase: sessPhase(S.session) });
+    S.stage3d = st; S.unmount = () => { st.destroy(); S.stage3d = null; };
   },
 };
 function sessPhase(s) { if (s.done) return 'done'; if (s.t < 25) return 'preparing'; return s.cls !== 'ac' && s.kw < s.cap * 0.7 ? 'tapering' : 'charging'; }
@@ -2292,7 +2521,12 @@ SCREENS.flota = {
 /* ---- Vehicul ---- */
 SCREENS.vehicul = {
   tabs: false,
-  mount(el, p) { const v = vehicle(p.id), host = el.querySelector('#v3d'); if (!host) return; const w = with3D(api => api.mount(host, { model: v.model3d, mode: 'showcase', onReady() { host.classList.add('ready'); } })); S.unmount = () => w.stop(); },
+  mount(el, p) {
+    const v = vehicle(p.id), host = el.querySelector('#v3d'); if (!host) return;
+    const s = vehStatus(v), st = vStage(host, v, { mode: s.live ? 'charging' : 'showcase' });
+    if (s.live) st.update({ kw: s.kw, soc: s.soc, phase: 'charging' });
+    S.vstage = { id: v.id, st }; S.unmount = () => { st.destroy(); S.vstage = null; };
+  },
   html(p) {
     const v = vehicle(p.id), s = vehStatus(v), soc = s.soc, card = S.cards.find(c => c.veh === v.id), pool = S.cards.find(c => (c.pool || []).includes(v.id)), range = Math.round(v.range * soc / 100);
     let truckNote = '';
@@ -2308,9 +2542,9 @@ SCREENS.vehicul = {
       : row({ icon: 'card', tile: 'fault', title: 'Niciun card alocat', sub: `${esc(v.driver)} pornește încărcările din aplicație. Comandă un card pentru acest vehicul.`, go: 'comanda', data: ` data-id="${v.id}"` });
     return `${topbar(v.name)}<div class="pad stack-l">
       <div class="card stack" style="gap:0;overflow:hidden">
-        ${v.model3d ? `<div class="v3d" id="v3d" style="border-radius:0"></div>` : ''}
+        ${photoOf(v) ? `<div class="v3d" id="v3d" style="border-radius:0"></div>` : ''}
         <div class="stack" style="padding:12px 14px 14px;gap:10px"><div class="between"><span class="st ${s.live ? 'st-live' : 'st-off'}">${s.t}</span><span class="plate plate-lg">${v.plate}</span></div>
-        <div class="between" style="align-items:flex-end"><div><div class="num" style="font-size:40px;line-height:1">${Math.floor(soc)}%</div><div class="muted" style="font-size:13px">≈ ${range}${NB}km autonomie</div></div><span class="muted" style="font-size:12px">${v.model3d ? 'Rotește cu degetul' : ''}</span></div>
+        <div class="between" style="align-items:flex-end"><div><div class="num" style="font-size:40px;line-height:1">${Math.floor(soc)}%</div><div class="muted" style="font-size:13px">≈ ${range}${NB}km autonomie</div></div><span class="faint-t" style="font-size:11px;text-align:right;max-width:46%">${photoOf(v) ? `Foto: ${esc(photoOf(v).author.replace(/^©\s*/, ''))} · ${esc(photoOf(v).license)}` : ''}</span></div>
         <div class="bar" style="height:8px"><i style="width:${soc}%"></i></div></div></div>
       <div class="kv">${stat('Baterie', nf(v.batt, v.batt % 1 ? 1 : 0), 'kWh', v.kind === 'truck' ? 'capacitate declarată' : 'utilă')}${stat('DC maxim', v.maxMcs || v.maxDc, 'kW', v.maxMcs ? `MCS · CCS ${v.maxDc}${NB}kW` : v.mcsSoon ? 'CCS · MCS în curând' : 'CCS2')}${stat('AC maxim', v.maxAc, 'kW', 'Type 2')}${stat('Șofer', esc(v.driver), '', esc(v.center))}</div>
       ${truckNote}
@@ -2533,9 +2767,9 @@ SCREENS.despre = { tabs: false, html: () => `${topbar('Despre')}<div class="pad 
   <img class="lk-l" src="${LOGO.light}" alt="Termohabitat Fotovoltaice" style="height:30px;width:auto"><img class="lk-d" src="${LOGO.dark}" alt="Termohabitat Fotovoltaice" style="height:30px;width:auto">
   <p class="muted" style="max-width:34ch">Stații de încărcare alimentate de centralele fotovoltaice și bateriile montate de Termohabitat.</p>
   <div class="list" style="width:100%;text-align:left">${row({ icon: 'building', title: DATA.company.name, sub: `CUI ${DATA.company.cui}` })}${row({ icon: 'pin', title: 'Sediu', sub: DATA.company.hq })}${row({ icon: 'shield', title: 'Termeni și confidențialitate', go: 'confidentialitate' })}</div>
-  <details class="list faq" style="width:100%;text-align:left;padding-inline:14px"><summary>Modele 3D și licențe${ic('chevD', 's18')}</summary>
-    <div class="stack" style="gap:8px;margin-top:10px">${[...new Set(Object.values(MODELS3D).map(m => m.credit))].map(c => `<p class="muted" style="font-size:12.5px;margin:0">${esc(c)}</p>`).join('')}
-    <p class="muted" style="font-size:12px;margin:0">Licență CC BY 4.0: creativecommons.org/licenses/by/4.0. Modelele sunt scalate, comprimate și, unde e cazul, fără însemne sau cu altă culoare. Mărcile vehiculelor aparțin proprietarilor lor.</p></div></details>
+  <details class="list faq" style="width:100%;text-align:left;padding-inline:14px"><summary>Fotografii și licențe${ic('chevD', 's18')}</summary>
+    <div class="stack" style="gap:10px;margin-top:10px">${DATA.vehicles.filter(photoOf).map(v => { const f = photoOf(v); return `<p class="muted" style="font-size:12.5px;margin:0"><b style="color:var(--text)">${esc(v.name)}</b><br>„${esc(f.title)}” de ${esc(f.author)}, <a href="${f.licenseUrl}" target="_blank" rel="noopener">${esc(f.license)}</a> · <a href="${f.page}" target="_blank" rel="noopener">Wikimedia Commons</a></p>`; }).join('')}
+    <p class="muted" style="font-size:12px;margin:0">Fotografiile sunt decupate (fundal eliminat) și redimensionate. Mărcile vehiculelor aparțin proprietarilor lor; aplicația nu e afiliată producătorilor.</p></div></details>
   <p class="muted" style="font-size:12px;max-width:34ch">Stațiile, prețurile, vehiculele, flota și cardurile din prototip sunt date exemplu. Codul de operator TMH e provizoriu.</p></div>` };
 SCREENS.profil = { tabs: false, html: () => `${topbar('Profil')}<div class="pad stack-l"><div class="field"><label for="pn">Nume</label><input class="input" id="pn" value="${esc(DATA.me.name)}" autocomplete="name"></div><div class="field"><label for="pe">E-mail</label><input class="input" id="pe" type="email" value="${esc(DATA.me.email)}" autocomplete="email"></div><div class="field"><label for="pt">Telefon</label><input class="input" id="pt" type="tel" value="${esc(DATA.me.phone)}" autocomplete="tel"></div><p class="muted" id="pmsg" style="font-size:13px" aria-live="polite"></p><button class="btn btn-primary btn-lg btn-block" data-act="saveProfile">Salvează</button></div>` };
 
@@ -2925,11 +3159,12 @@ function tick() {
     set('price', nf(shown(s.cls, sessPrice(s, b)), 2)); set('bandlbl', bandLabel(b)); set('eta', etaLine(s)); set('hint', hintLine(s)); set('status', liveStatus(s)); set('chart', powerChart(s)); set('mix', mixBars(s));
     set('solartag', ic('sun', 's16') + s.solar + '%' + NB + 'solar'); set('peak', 'vârf ' + Math.round(Math.max(...s.hist.map(h => h[1]), s.kw)) + NB + 'kW'); set('bandnote', bandNote(s));
     const sf = el.querySelector('[data-live="socfill"]'); if (sf) sf.style.width = s.soc + '%';
-    if (S.stage3d && S.stage3d.h) S.stage3d.h.update({ kw: s.kw, soc: s.soc, phase: sessPhase(s) });
+    if (S.stage3d) S.stage3d.update({ kw: s.kw, soc: s.soc, phase: sessPhase(s) });
     const lbl = el.querySelector('#stopSlide .sl-label'); if (lbl && s.done && lbl.textContent !== 'Glisează pentru a încheia') lbl.textContent = 'Glisează pentru a încheia';
   }
   if (s && route === 'harta') { set('kw', nf(s.kw, 1) + '<small>kW</small>'); set('cost', lei(sessTotal(s))); set('socline', Math.floor(s.soc) + '% · ' + esc(station(s.st).city)); set('lpt', `${s.done ? 'Încărcare completă' : 'Se încarcă'} · ${esc(vehicle(s.veh).name)}`); }
   if (route === 'statie') { const st = station(curTop().p.id); if (!someNoSignal(st).length) { const sec = Math.round((Date.now() - S.shownAt) / 1000) % 30; set('updated', `Starea punctelor: actualizată acum ${sec < 5 ? 'câteva secunde' : sec + NB + 's'}`); } }
+  if (route === 'vehicul' && S.vstage) { const st = vehStatus(vehicle(S.vstage.id)); if (st.live) S.vstage.st.update({ kw: st.kw, soc: st.soc, phase: 'charging' }); }
   if (route === 'flota') DATA.vehicles.forEach(v => { const st = vehStatus(v); if (!st.live) return; const kw = el.querySelector(`[data-live="fkw-${v.id}"]`), soc = el.querySelector(`[data-live="fsoc-${v.id}"]`); if (kw) kw.textContent = Math.round(st.kw); if (soc) soc.style.width = st.soc + '%'; });
   if (!$('#livepill').hidden) livePill();
   islandRender();
@@ -3067,7 +3302,7 @@ function islandRender() {
   if (L.dataset.ic !== icon) { L.dataset.ic = icon; L.innerHTML = `<span class="mini"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.4" stroke="#2A302A"/><circle class="mv" cx="9" cy="9" r="7.4" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" style="transition:stroke-dashoffset .8s ease"/></svg>${ic(icon)}</span>`; }
   const mv = L.querySelector('.mv'); mv.setAttribute('stroke', col); mv.setAttribute('stroke-dashoffset', (C * (1 - s.soc / 100)).toFixed(1));
   if (Rr.textContent !== soc + '%') Rr.textContent = soc + '%';
-  const pic = ic(VKIND[v.kind][0]) + (v.model3d ? `<img src="${window.ASSET_BASE || ''}img/veh-${v.model3d}.png" alt="" onerror="this.remove()">` : '');
+  const pic = photoOf(v) ? vehThumb(v) : ic(VKIND[v.kind][0]);
   const sub = s.done ? (fee ? `Taxă de ocupare ${lei(idleFee(s))}` : idleLeft(s) === Infinity ? 'Încărcare completă' : `Gratuit încă ${clock(idleLeft(s))}`) : etaLine(s).replace(/^Până la \d+%: /, '');
   const x = d.querySelector('#dynX');
   /* prima dată construim structura; apoi schimbăm doar valorile, ca bara să curgă lin și butonul să nu se refacă */
@@ -3092,8 +3327,119 @@ document.addEventListener('click', e => {
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.session && !$('#dyn').hidden) { islandPulse(); islandSet('expanded', 3500); } });
 function islandOnStart() { ISL.lastDone = false; setTimeout(() => { islandRender(); if (!$('#dyn').hidden) { islandPulse(); islandSet('expanded', 3500); } }, 420); }
 
+/* ============================================================
+   07 · scena vehiculului din fotografie (fără 3D)
+   Fotografia reală, decupată, stă pe un sol cu umbră moale. La încărcare: stâlpul Termohabitat
+   lângă priza reală a vehiculului, cablul, energia care curge spre priză, priza care pulsează, inele pe sol.
+   ============================================================ */
+const PHASE = { preparing: '#F2A93B', charging: '#8BE04E', tapering: '#72BF44', done: '#5B93FF', idle: '#72BF44' };
+const photoOf = v => v && typeof PHOTOS !== 'undefined' ? PHOTOS[v.id] : null;
+const photoUrl = (p, small) => (window.ASSET_BASE || '') + (small ? p.thumb : p.src);
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function vStage(host, v, opts = {}) {
+  const p = photoOf(v), mode = opts.mode || 'showcase';
+  if (!p) { host.classList.add('failed'); return { update() {}, destroy() {} }; }
+  const NS = 'http://www.w3.org/2000/svg';
+  host.classList.add('vstage', 'vs-' + mode);
+  host.insertAdjacentHTML('beforeend', `<div class="vs-floor"><i></i><i></i><i></i></div><div class="vs-shadow"></div>
+    <img class="vs-img" src="${photoUrl(p)}" alt="${esc(v.name)}" decoding="async">
+    <svg class="vs-fx" aria-hidden="true"><defs><filter id="vsGlow${v.id}" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+      <g class="vs-post"></g><path class="vs-cable"/><path class="vs-flow"/><g class="vs-dots" filter="url(#vsGlow${v.id})"></g></svg>
+    <div class="vs-port"></div>`);
+  const img = host.querySelector('.vs-img'), svg = host.querySelector('.vs-fx'), post = svg.querySelector('.vs-post');
+  const cable = svg.querySelector('.vs-cable'), flow = svg.querySelector('.vs-flow'), dotsG = svg.querySelector('.vs-dots');
+  const portEl = host.querySelector('.vs-port'), shadow = host.querySelector('.vs-shadow'), floor = host.querySelector('.vs-floor');
+  const N = 8, dots = Array.from({ length: N }, (_, i) => { const c = document.createElementNS(NS, 'circle'); c.setAttribute('r', '2.6'); dotsG.appendChild(c); return { c, t: i / N }; });
+  let state = { kw: 0, soc: 50, phase: mode === 'charging' ? 'charging' : 'idle' }, len = 0, raf = 0, alive = true, last = 0, geo = null;
+
+  /* încadrare: mașinile întregi; la ansamblurile TIR, cabina și începutul remorcii (restul iese din cadru) */
+  function layout() {
+    const W = host.clientWidth, H = host.clientHeight; if (!W || !H) return;
+    const charging = mode === 'charging', focus = charging ? (p.focus || 1) : 1;
+    const aspect = p.w / p.h, heavy = v.kind === 'truck';
+    const ground = H * (charging ? 0.84 : 0.88);
+    /* lățimea vizibilă țintă a vehiculului și înălțimea maximă */
+    const maxW = W * (charging ? (heavy ? 0.66 : 0.72) : 0.9), maxH = H * (charging ? (heavy ? 0.72 : 0.64) : 0.78);
+    let visW = Math.min(maxW, maxH * aspect * focus), imgW = visW / focus, imgH = imgW / aspect;
+    if (imgH > maxH) { imgH = maxH; imgW = imgH * aspect; visW = imgW * focus; }
+    const pad = 0.028 * Math.max(imgW, imgH) / 1.06;
+    const side = p.port[0] > 50 ? 1 : -1;
+    /* vehiculul se dă puțin la o parte ca să încapă stâlpul pe partea prizei */
+    const shift = charging ? -side * W * 0.08 : 0;
+    const front = p.facing === 'left' ? 0 : 1;
+    let left = W / 2 - visW / 2 + shift - (front ? (imgW - visW) : 0);
+    if (focus < 1 && front === 0) left = W / 2 - visW / 2;
+    const top = ground - imgH + pad;
+    Object.assign(img.style, { width: imgW + 'px', height: imgH + 'px', left: left + 'px', top: top + 'px' });
+    const visLeft = front === 0 ? left : left + imgW - visW;
+    Object.assign(shadow.style, { left: visLeft + visW * 0.04 + 'px', width: visW * 0.92 + 'px', top: ground - imgH * 0.05 + 'px', height: imgH * 0.12 + 'px' });
+    Object.assign(floor.style, { left: visLeft + visW / 2 + 'px', top: ground + 'px', width: visW * 0.82 + 'px' });
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    const px = left + imgW * p.port[0] / 100, py = top + imgH * p.port[1] / 100;
+    portEl.style.left = px + 'px'; portEl.style.top = py + 'px';
+    geo = { W, H, ground, px, py, side, imgH, visLeft, visW, heavy };
+    if (charging) drawPost();
+  }
+  /* stâlpul Termohabitat: alb, capac închis, ecran în culoarea fazei */
+  function drawPost() {
+    const { ground, px, py, side, imgH, visLeft, visW, heavy, W } = geo;
+    const h = Math.min(geo.H * 0.52, heavy ? imgH * 0.5 : v.kind === 'van' ? imgH * 0.56 : imgH * 0.74), w = h * 0.27;
+    /* mașini: lângă vehicul, pe partea prizei; camioane: în față, lângă priză (camionul umple cadrul) */
+    let x = side > 0 ? visLeft + visW + W * 0.04 : visLeft - W * 0.04 - w;
+    x = Math.max(6, Math.min(W - w - 6, x));
+    const b = ground;
+    const y = b - h;
+    post.innerHTML = `<ellipse cx="${x + w / 2}" cy="${b}" rx="${w * 0.9}" ry="${w * 0.16}" fill="rgb(0 0 0 / .22)"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${w * 0.2}" fill="#F4F6F2" stroke="rgb(0 0 0 / .12)"/>
+      <rect x="${x - w * 0.04}" y="${y - h * 0.02}" width="${w * 1.08}" height="${h * 0.06}" rx="${w * 0.12}" fill="#231F20"/>
+      <rect class="vs-screen" x="${x + w * 0.16}" y="${y + h * 0.13}" width="${w * 0.68}" height="${h * 0.2}" rx="${w * 0.08}"/>
+      <path d="M${x + w * 0.54} ${y + h * 0.16}l-${w * 0.14} ${h * 0.08}h${w * 0.1}l-${w * 0.08} ${h * 0.07}" fill="none" stroke="#10140F" stroke-width="${Math.max(1.2, w * 0.05)}" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect class="vs-stripe" x="${x + w * (side > 0 ? 0.12 : 0.8)}" y="${y + h * 0.4}" width="${w * 0.08}" height="${h * 0.5}" rx="${w * 0.04}"/>`;
+    /* cablul: din priza stâlpului, lasă o buclă spre sol, urcă la priza vehiculului */
+    const sx = side > 0 ? x : x + w, sy = y + h * 0.42;
+    /* bucla cablului coboară aproape de sol, între stâlp și vehicul */
+    const sag = Math.max(ground - 4, Math.max(sy, py) + 22), span = Math.abs(sx - px);
+    const d = `M${sx} ${sy} C${sx - side * Math.max(18, span * 0.35)} ${sag}, ${px + side * Math.max(24, span * 0.3)} ${sag}, ${px} ${py}`;
+    cable.setAttribute('d', d); flow.setAttribute('d', d);
+    len = cable.getTotalLength();
+  }
+  function frame(t) {
+    if (!alive) return;
+    raf = requestAnimationFrame(frame);
+    if (document.hidden || !len || mode !== 'charging') return;
+    const dt = Math.min(0.05, (t - (last || t)) / 1000); last = t;
+    const active = state.phase === 'charging' || state.phase === 'tapering' || state.phase === 'preparing';
+    const speed = reducedMotion ? 0 : state.phase === 'preparing' ? 0.12 : 0.22 + Math.min(1, state.kw / (v.kind === 'truck' ? 700 : 250)) * 0.6;
+    dots.forEach((d, i) => {
+      d.t = (d.t + dt * speed) % 1;
+      const pt = cable.getPointAtLength(d.t * len);
+      d.c.setAttribute('cx', pt.x.toFixed(1)); d.c.setAttribute('cy', pt.y.toFixed(1));
+      d.c.setAttribute('opacity', active ? (0.35 + 0.65 * Math.sin(d.t * Math.PI)).toFixed(2) : 0);
+    });
+  }
+  const ro = new ResizeObserver(layout); ro.observe(host);
+  const ready = () => { layout(); host.classList.add('ready'); if (opts.onReady) opts.onReady(); };
+  if (img.complete && img.naturalWidth) ready(); else { img.addEventListener('load', ready, { once: true }); img.addEventListener('error', () => { host.classList.add('failed'); if (opts.onError) opts.onError(); }, { once: true }); }
+  raf = requestAnimationFrame(frame);
+  function update(s) {
+    Object.assign(state, s);
+    host.style.setProperty('--ph', PHASE[state.phase] || PHASE.charging);
+    host.dataset.phase = state.phase;
+    /* energia de pe sol crește cu puterea */
+    const k = Math.min(1, state.kw / (v.kind === 'truck' ? 700 : 250));
+    host.style.setProperty('--pw', (0.35 + k * 0.65).toFixed(2));
+  }
+  update(state);
+  return { update, destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); } };
+}
+/* miniatura din listă (sau iconița, dacă vehiculul n-are fotografie) */
+function vehThumb(v, cls = '') {
+  const p = photoOf(v);
+  return p ? `<img class="vthumb ${cls}" src="${photoUrl(p, true)}" alt="" loading="lazy" decoding="async">` : ic(VKIND[v.kind][0], 's26');
+}
+
 </script>
-<script type="module" src="js/car3d.js"></script>
 <script>if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}</script>
 </body>
 </html>

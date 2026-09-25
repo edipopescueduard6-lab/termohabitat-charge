@@ -1,6 +1,6 @@
 /* cache offline pentru Termohabitat Charge — versiunea se schimbă la fiecare build */
-const V = 'thc-659562c3b0';
-const CORE = ["./", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/car3d.js", "manifest.webmanifest", "models/suv.glb", "vendor/addons/environments/RoomEnvironment.js", "vendor/addons/libs/meshopt_decoder.module.js", "vendor/addons/loaders/GLTFLoader.js", "vendor/addons/utils/BufferGeometryUtils.js", "vendor/three.module.min.js"];
+const V = 'thc-132f13e15b';
+const CORE = ["./", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "img/v/atto3-s.webp", "img/v/atto3.webp", "img/v/daf-s.webp", "img/v/daf.webp", "img/v/eactros-s.webp", "img/v/eactros.webp", "img/v/etgx-s.webp", "img/v/etgx.webp", "img/v/etransit-s.webp", "img/v/etransit.webp", "img/v/fh-s.webp", "img/v/fh.webp", "img/v/ix2-s.webp", "img/v/ix2.webp", "img/v/model-y-s.webp", "img/v/model-y.webp", "img/v/puma-s.webp", "img/v/puma.webp", "img/v/q8-s.webp", "img/v/q8.webp", "img/v/spring-s.webp", "img/v/spring.webp", "index.html", "manifest.webmanifest"];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
