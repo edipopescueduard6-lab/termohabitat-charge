@@ -152,6 +152,8 @@ function mount(host, opts = {}) {
       mats.forEach((m, i) => {
         if (!m) return;
         if (m.envMapIntensity != null) m.envMapIntensity = c.env || 1.15;
+        /* modele colorate prin culori de vârf: le dăm culori reale pe material, după nume */
+        if (c.matColors && c.matColors[m.name]) { const [col, met, rou] = c.matColors[m.name]; m.vertexColors = false; m.color.set(col); m.metalness = met; m.roughness = rou; m.needsUpdate = true; }
         /* suprafețe fără grafica autorului (ex. prelata remorcii): albe, curate */
         if (c.plainMats && c.plainMats.includes(m.name)) { m.map = null; m.color.set(0xF3F5F2); m.roughness = 0.42; m.metalness = 0.05; m.needsUpdate = true; }
         /* sticlă: transparentă, fumurie, cu reflexii */
