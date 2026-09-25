@@ -1,5 +1,5 @@
 /* cache offline pentru Termohabitat Charge — versiunea se schimbă la fiecare build */
-const V = 'thc-a56d713d1d';
+const V = 'thc-cf95f3bde4';
 const CORE = ["./", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/car3d.js", "manifest.webmanifest", "models/suv.glb", "vendor/addons/environments/RoomEnvironment.js", "vendor/addons/libs/meshopt_decoder.module.js", "vendor/addons/loaders/GLTFLoader.js", "vendor/addons/utils/BufferGeometryUtils.js", "vendor/three.module.min.js"];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });

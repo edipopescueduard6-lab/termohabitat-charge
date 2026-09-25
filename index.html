@@ -57,7 +57,9 @@
   --f-mono:ui-monospace,"SF Mono",Menlo,"Cascadia Mono",Consolas,monospace;
   --sat:0px; --sab:0px; --sbar-h:0px;
   --top:calc(var(--sbar-h) + var(--sat));
-  --tab-core:50px; --tabbar-h:calc(var(--tab-core) + var(--sab));
+  /* bara de taburi plutitoare (iOS 26): capsulă de 62 px, coborâtă spre indicatorul Home */
+  --tab-core:62px; --tab-gap:max(10px, calc(var(--sab) - 14px)); --tabbar-h:calc(var(--tab-core) + var(--tab-gap));
+  --spring:cubic-bezier(.3,1.45,.5,1); --ease-out:cubic-bezier(.2,.8,.2,1);
   color-scheme:light;
 }
 .pwa{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
@@ -160,7 +162,9 @@ p{margin:0}
   body{background:var(--stage)}
   .stage{display:grid;grid-template-columns:minmax(230px,270px) auto;justify-content:center;align-items:center;gap:clamp(28px,4vw,64px);padding-inline:28px;padding-block:20px}
   .rail{display:flex;flex-direction:column;gap:16px;max-height:100%;overflow:auto;color:var(--stage-ink);scrollbar-width:thin}
-  .device{width:393px;height:min(852px,calc(100dvh - 40px));border-radius:54px;box-shadow:0 0 0 11px var(--bezel),0 0 0 12px #3a3f39,0 40px 90px rgb(0 0 0 / .28);--sbar-h:50px;--sab:20px}
+  .device{width:393px;height:min(852px,calc(100dvh - 40px));border-radius:54px;box-shadow:0 0 0 11px var(--bezel),0 0 0 12px #3a3f39,0 40px 90px rgb(0 0 0 / .28);--sbar-h:50px;--sab:20px;
+    /* variabilele derivate se recalculează aici, altfel rămân cu valorile de la :root */
+    --top:calc(var(--sbar-h) + var(--sat));--tab-gap:max(10px, calc(var(--sab) - 14px));--tabbar-h:calc(var(--tab-core) + var(--tab-gap))}
   .sbar{display:flex;position:absolute;z-index:60;top:0;left:0;right:0;height:50px;align-items:center;justify-content:space-between;padding:6px 30px 0 36px;font:600 15px var(--f-body);color:var(--text);pointer-events:none;font-variant-numeric:tabular-nums}
   .sbar .sb-ic{display:flex;gap:6px;align-items:center}
   .island{display:block;position:absolute;z-index:61;top:11px;left:50%;transform:translateX(-50%);width:122px;height:35px;border-radius:20px;background:#000;pointer-events:none}
@@ -209,7 +213,7 @@ p{margin:0}
 .wrap{flex-wrap:wrap}
 
 /* bara de navigare */
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 8px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.8) blur(18px);-webkit-backdrop-filter:saturate(1.8) blur(18px)}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 8px;background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:saturate(1.8) blur(18px);-webkit-backdrop-filter:saturate(1.8) blur(18px)}
 .topbar .tb-title{flex:1;min-width:0;font-weight:600;font-size:16px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar .tb-side{width:40px;display:flex;justify-content:center}
 .topbar .iconbtn{width:36px;height:36px;border-radius:50%}
@@ -222,8 +226,14 @@ p{margin:0}
 .link{border:0;background:none;padding:4px 2px;font-weight:500;font-size:15px;color:var(--brand-ink)}
 
 /* butoane */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border-radius:12px;border:0;font-weight:600;font-size:15px;white-space:nowrap;transition:transform .12s ease,background-color .15s ease,opacity .15s}
-.btn:active{transform:scale(.97);opacity:.9}
+.btn{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:7px;height:44px;padding:0 16px;border-radius:12px;border:0;font-weight:600;font-size:15px;white-space:nowrap;transition:transform .34s var(--spring),background-color .15s ease,opacity .15s,box-shadow .2s}
+.btn:active{transform:scale(.95);transition-duration:.08s,.15s,.15s,.2s}
+.btn .ic{transition:transform .34s var(--spring)}
+.btn:active .ic{transform:scale(.9)}
+/* undă la apăsare (poziționată din JS, la locul degetului) */
+.tapfx{position:absolute;border-radius:50%;pointer-events:none;background:currentColor;opacity:.18;transform:translate(-50%,-50%) scale(0);animation:tapfx .55s var(--ease-out) forwards}
+@keyframes tapfx{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+.btn-primary{box-shadow:0 1px 0 rgb(255 255 255 / .25) inset,0 4px 14px color-mix(in srgb,var(--brand) 28%,transparent)}
 .btn-primary{background:var(--brand);color:var(--on-brand)}
 .btn-primary:hover{background:var(--brand-hover)}
 .btn-dark{background:var(--inverse-bg);color:var(--inverse-text)}
@@ -238,6 +248,25 @@ a.btn{text-decoration:none}
 .iconbtn{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;border:0;background:color-mix(in srgb,var(--surface) 92%,transparent);color:var(--text);box-shadow:var(--shadow-float);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
 .iconbtn.flat{box-shadow:none;background:var(--fill)}
 .iconbtn.bare{box-shadow:none;background:transparent}
+/* animații de apăsare pentru toate elementele pe care se poate atinge: coboară rapid, revin cu arc */
+.iconbtn,.avatar,.chip,.link,.seg button,.srow,.conn,.opt,.veh,.rfid,.pin .pb,.sl-knob,.stepdot,.faq summary,.tag[data-act]{transition:transform .34s var(--spring),background-color .18s,box-shadow .2s,color .18s,opacity .18s}
+.iconbtn:active,.avatar:active{transform:scale(.86);transition-duration:.08s}
+.chip:active,.link:active,.seg button:active{transform:scale(.93);transition-duration:.08s}
+.srow:active,.conn:active,.opt:active,.veh:active{transform:scale(.975);transition-duration:.1s}
+.rfid:active{transform:scale(.96) rotate(-.6deg);transition-duration:.1s}
+.pin:active .pb{transform:scale(.9);transition-duration:.08s}
+button.row,a.row{transition:background-color .2s}
+a.row:active{background:var(--fill)}
+button.row:active .tile{transform:scale(.88)}
+.tile{transition:transform .34s var(--spring)}
+.iconbtn[aria-pressed="true"] .ic{animation:tabPop .45s var(--spring)}
+.chip[aria-pressed="true"]{animation:chipOn .35s var(--spring)}
+@keyframes chipOn{0%{transform:scale(.92)}100%{transform:none}}
+.link{border-radius:8px}
+[tabindex="-1"]:focus{outline:none}
+/* intrarea în ecran: blocurile urcă ușor, pe rând */
+.rise-in{animation:riseIn .52s var(--ease-out) backwards}
+@keyframes riseIn{from{opacity:0;transform:translateY(12px)}}
 
 /* cipuri, stări */
 .chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-block:2px}
@@ -330,7 +359,13 @@ button.row:active,.veh:active{background:var(--fill)}
 .sw input:focus-visible+span{outline:2.5px solid var(--focus);outline-offset:2px}
 .seg{display:flex;gap:2px;padding:2px;border-radius:9px;background:var(--fill)}
 .seg button{flex:1;min-width:0;height:30px;border:0;border-radius:7px;background:transparent;font-weight:500;font-size:13.5px;color:var(--text);white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 8px}
-.seg button[aria-pressed="true"]{background:var(--seg-on);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0 / .12),0 2px 8px rgb(0 0 0 / .06),inset 0 0 0 .5px var(--seg-ring)}
+.seg button[aria-pressed="true"]{background:var(--seg-on);font-weight:600;box-shadow:0 1px 2px rgb(0 0 0 / .12),0 2px 8px rgb(0 0 0 / .06),inset 0 0 0 .5px var(--seg-ring);animation:segIn .38s var(--spring)}
+@keyframes segIn{0%{transform:scale(.9);opacity:.6}100%{transform:none;opacity:1}}
+.opt[aria-pressed="true"] .radio::after,.opt[aria-checked="true"] .radio::after{animation:dotPop .4s var(--spring)}
+@keyframes dotPop{0%{transform:scale(0)}100%{transform:none}}
+.sw span::after{transition:transform .32s var(--spring),width .2s}
+.sw input:active+span::after{width:32px}
+.sw input:checked:active+span::after{transform:translateX(15px)}
 .range{width:100%;accent-color:var(--t-green);height:26px}
 .rng-lab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:500;margin-top:-2px;font-variant-numeric:tabular-nums}
 .field{display:flex;flex-direction:column;gap:6px}
@@ -360,20 +395,38 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .slide.done .sl-label{animation:none}
 @keyframes shimmer{from{background-position:100% 0}to{background-position:-150% 0}}
 
-/* bara de taburi (ca pe iOS) cu butonul de scanare */
-.tabbar{position:absolute;z-index:40;left:0;right:0;bottom:0;height:var(--tabbar-h);padding-bottom:var(--sab);display:grid;grid-template-columns:repeat(5,1fr);align-items:stretch;background:color-mix(in srgb,var(--surface) 84%,transparent);backdrop-filter:saturate(1.8) blur(20px);-webkit-backdrop-filter:saturate(1.8) blur(20px);border-top:.5px solid var(--sep)}
-.tab{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--faint);font-size:10px;font-weight:500;padding-top:2px}
-.tab .ic{width:24px;height:24px;stroke-width:1.6}
+/* bara de taburi plutitoare (ca pe iOS 26): capsulă de sticlă, iconițe centrate, scanarea la mijloc */
+.tabbar{position:absolute;z-index:40;left:12px;right:12px;bottom:var(--tab-gap);height:var(--tab-core);border-radius:calc(var(--tab-core) / 2);padding:0 5px;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:saturate(1.9) blur(26px);-webkit-backdrop-filter:saturate(1.9) blur(26px);box-shadow:0 0 0 .5px var(--sep),0 10px 30px rgb(20 28 16 / .16),0 2px 6px rgb(20 28 16 / .06);animation:barIn .5s var(--spring) backwards}
+@keyframes barIn{from{transform:translateY(24px);opacity:0}}
+/* conținutul se stinge sub capsulă, nu se vede prin ea */
+.app.tabs-on::after{content:"";position:absolute;z-index:38;left:0;right:0;bottom:0;height:calc(var(--tabbar-h) + 26px);background:linear-gradient(0deg,var(--bg) 0%,var(--bg) 60%,color-mix(in srgb,var(--bg) 0%,transparent) 100%);pointer-events:none}
+.app.tabs-on.on-scan::after{display:none}
+.app.on-scan .tabbar{background:rgb(30 35 30 / .9);box-shadow:0 0 0 .5px rgb(255 255 255 / .1),0 10px 30px rgb(0 0 0 / .4)}
+.app.on-scan .tab{color:#A9B3A4}
+.app.on-scan .tab::before{background:rgb(255 255 255 / .1)}
+.tab{position:relative;height:52px;border:0;border-radius:26px;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--muted);font-size:10.5px;font-weight:600;letter-spacing:.01em;transition:color .2s,transform .25s var(--spring)}
+.tab::before{content:"";position:absolute;inset:0 3px;border-radius:26px;background:var(--brand-soft);opacity:0;transform:scale(.7);transition:opacity .25s,transform .35s var(--spring)}
+.tab>*{position:relative}
+.tab .ic{width:24px;height:24px;stroke-width:1.6;transition:transform .35s var(--spring)}
 .tab[aria-current="page"]{color:var(--brand-ink)}
-.tab[aria-current="page"] .ic{stroke-width:2}
-.tab-scan{position:relative;border:0;background:transparent;display:flex;justify-content:center}
-.tab-scan .fab{position:absolute;top:-14px;width:54px;height:54px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 0 0 4px var(--bg),0 6px 16px rgb(60 120 30 / .32);transition:transform .15s}
-.tab-scan:active .fab{transform:scale(.93)}
+.tab[aria-current="page"]::before{opacity:1;transform:none}
+.tab[aria-current="page"] .ic{stroke-width:2;animation:tabPop .45s var(--spring)}
+@keyframes tabPop{0%{transform:scale(.8)}60%{transform:scale(1.14)}100%{transform:none}}
+.tab:active{transform:scale(.9)}
+.tab-scan{position:relative;height:52px;border:0;background:transparent;display:grid;place-items:center}
+.tab-scan .fab{width:50px;height:50px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 4px 14px rgb(60 120 30 / .38),inset 0 1px 0 rgb(255 255 255 / .35);transition:transform .3s var(--spring),box-shadow .2s}
+.tab-scan .fab::after{content:"";position:absolute;inset:1px;border-radius:50%;box-shadow:0 0 0 0 color-mix(in srgb,var(--brand) 60%,transparent);animation:scanPing 3.2s ease-out 1.2s 2}
+@keyframes scanPing{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--brand) 55%,transparent)}70%,100%{box-shadow:0 0 0 12px transparent}}
+.tab-scan:active .fab{transform:scale(.88)}
+.tab-scan[aria-current="page"] .fab{box-shadow:0 0 0 3px color-mix(in srgb,var(--brand) 35%,transparent),0 4px 14px rgb(60 120 30 / .38)}
 .tab-scan .fab .ic{width:25px;height:25px;stroke-width:2}
-.tab-scan .lbl{position:absolute;bottom:4px;font-size:10px;font-weight:600;color:var(--text)}
+.tab-scan .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
-/* pastila de încărcare activă */
-.livepill{position:absolute;z-index:39;left:10px;right:10px;bottom:calc(var(--tabbar-h) + 8px);display:flex;align-items:center;gap:11px;height:54px;padding:0 12px 0 7px;border-radius:16px;border:0;background:var(--live-bg);color:var(--live-text);box-shadow:var(--shadow-float);text-align:left;animation:fadeIn .3s ease-out}
+/* pastila de încărcare activă (doar când insula nu e disponibilă) */
+.livepill{position:absolute;z-index:39;left:12px;right:12px;bottom:calc(var(--tabbar-h) + 8px);display:flex;align-items:center;gap:11px;height:54px;padding:0 14px 0 7px;border-radius:27px;border:0;background:var(--live-bg);color:var(--live-text);box-shadow:var(--shadow-float);text-align:left;animation:pillIn .45s var(--spring) backwards;transition:transform .25s var(--spring)}
+@keyframes pillIn{from{transform:translateY(18px) scale(.96);opacity:0}}
+.livepill:active{transform:scale(.97)}
+.livepill .lp-bolt{border-radius:50%!important}
 .livepill.inline{position:relative;left:auto;right:auto;bottom:auto;width:100%;animation:none;box-shadow:none}
 .livepill .lp-bolt{width:40px;height:40px;border-radius:12px;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;flex:none;position:relative;overflow:hidden}
 :root[data-theme="dark"] .livepill .lp-bolt{background:var(--live-text);color:var(--brand)}
@@ -391,16 +444,33 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 /* foi modale */
 .modal{position:absolute;inset:0;z-index:80;display:flex;flex-direction:column;justify-content:flex-end;background:var(--scrim);animation:scrimIn .22s ease-out}
 @keyframes scrimIn{from{background:transparent}}
-.msheet{background:var(--bg);border-radius:14px 14px 0 0;max-height:calc(100% - var(--top) - 12px);overflow-y:auto;padding:8px 16px calc(20px + var(--sab));animation:sheetUp .34s cubic-bezier(.2,.85,.25,1);scrollbar-width:none}
+.modal.out{animation:scrimOut .24s ease-in forwards;pointer-events:none}
+.modal.out .msheet{animation:sheetDown .24s cubic-bezier(.4,0,1,1) forwards}
+@keyframes scrimOut{to{background:transparent}}
+@keyframes sheetDown{to{transform:translateY(100%)}}
+.msheet{background:var(--bg);border-radius:22px 22px 0 0;max-height:calc(100% - var(--top) - 12px);overflow-y:auto;padding:8px 16px calc(20px + var(--sab));animation:sheetUp .42s var(--spring);scrollbar-width:none;box-shadow:0 -10px 40px rgb(0 0 0 / .18)}
+.msheet:has(.sheet-cta){padding-bottom:0}
+/* acțiunea principală a foii rămâne mereu vizibilă jos, fără derulare */
+.sheet-cta{position:sticky;bottom:0;z-index:3;margin:4px -16px 0;padding:12px 16px calc(12px + var(--sab));background:var(--bg);box-shadow:0 -.5px 0 var(--sep),0 -12px 24px -12px rgb(0 0 0 / .12);display:flex;flex-direction:column;gap:8px}
 .msheet::-webkit-scrollbar{display:none}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:none}}
 .handle{width:36px;height:5px;border-radius:3px;background:var(--line-strong);margin:0 auto 10px}
 .msheet h3{font:600 20px/1.2 var(--f-display);letter-spacing:-.015em}
 
 /* toast */
-.toast{position:absolute;z-index:95;left:50%;top:calc(var(--top) + 8px);transform:translateX(-50%);display:flex;align-items:center;gap:9px;width:max-content;max-width:calc(100% - 32px);padding:10px 15px 10px 12px;border-radius:14px;background:color-mix(in srgb,var(--inverse-bg) 92%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--inverse-text);font-weight:500;font-size:14px;box-shadow:var(--shadow-float);animation:toastIn .32s cubic-bezier(.2,.9,.3,1.2)}
-.toast .ic{color:var(--brand)}
-@keyframes toastIn{from{opacity:0;transform:translate(-50%,-12px)}to{opacity:1;transform:translate(-50%,0)}}
+/* mesajele apar jos, deasupra barei (sus sunt insula și bara de titlu) */
+.toast{position:absolute;z-index:95;left:50%;bottom:calc(var(--sab) + 96px);transform:translateX(-50%);display:flex;align-items:center;gap:9px;width:max-content;max-width:calc(100% - 32px);padding:11px 16px 11px 13px;border-radius:22px;background:color-mix(in srgb,var(--inverse-bg) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--inverse-text);font-weight:500;font-size:14px;line-height:1.3;box-shadow:var(--shadow-float);animation:toastIn .45s var(--spring)}
+.app.tabs-on .toast{bottom:calc(var(--tabbar-h) + 14px)}
+.app.tabs-on.has-pill .toast{bottom:calc(var(--tabbar-h) + 74px)}
+/* cu o foaie deschisă, mesajul urcă sus, ca să nu acopere glisorul foii */
+.app:has(.modal:not(.out)) .toast{bottom:auto;top:calc(var(--top) + 10px)}
+.toast.out{animation:toastOut .25s ease-in forwards}
+.toast .ic{color:var(--brand);flex:none}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,16px) scale(.94)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes toastOut{to{opacity:0;transform:translate(-50%,10px) scale(.96)}}
+/* bara de stare: fundal estompat cât derulezi (ca la iOS), ca textul să nu treacă pe sub ceas */
+.sbshade{position:absolute;z-index:36;top:0;left:0;right:0;height:var(--top);background:color-mix(in srgb,var(--bg) 93%,transparent);backdrop-filter:blur(16px) saturate(1.7);-webkit-backdrop-filter:blur(16px) saturate(1.7);opacity:0;transition:opacity .2s;pointer-events:none}
+.sbshade.on{opacity:1}
 
 /* ---------- harta ---------- */
 .mapwrap{position:absolute;inset:0;overflow:hidden;overflow:clip;background:var(--map-land);touch-action:none;cursor:grab}
@@ -457,7 +527,10 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .search input:focus{outline:none}
 .avatar{width:34px;height:34px;border-radius:50%;background:var(--inverse-bg);color:var(--inverse-text);display:grid;place-items:center;font-weight:600;font-size:13px;border:0;flex:none}
 .map-ctrl{position:absolute;z-index:10;right:12px;display:flex;flex-direction:column;gap:6px;transition:bottom .3s cubic-bezier(.2,.8,.2,1),opacity .2s}
-.map-ctrl .iconbtn{width:38px;height:38px;border-radius:11px}
+.map-ctrl .iconbtn{width:40px;height:40px;border-radius:50%}
+/* pe telefon: zoom cu două degete sau dublă atingere, fără butoane +/−; legenda e în josul listei */
+@media (pointer:coarse){.map-ctrl [data-act="zin"],.map-ctrl [data-act="zout"]{display:none}}
+@media (max-width:979.98px){.map-legend{display:none}}
 .map-legend{position:absolute;z-index:9;left:12px;font-size:10.5px;font-weight:500;color:var(--map-label);background:color-mix(in srgb,var(--surface) 78%,transparent);padding:2px 7px;border-radius:6px;transition:bottom .3s cubic-bezier(.2,.8,.2,1)}
 .homesheet{position:absolute;z-index:30;left:0;right:0;bottom:0;background:var(--bg);border-radius:14px 14px 0 0;box-shadow:var(--shadow-sheet);display:flex;flex-direction:column;transition:height .34s cubic-bezier(.2,.8,.2,1)}
 .homesheet .hs-grip{border:0;background:transparent;padding:7px 0 3px;width:100%;cursor:grab;touch-action:none}
@@ -477,6 +550,10 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .srow .sr-ic{width:36px;height:36px;border-radius:10px;flex:none;display:grid;place-items:center;background:var(--brand-soft);color:var(--brand-ink)}
 .srow .sr-ic .ic{width:20px;height:20px}
 .srow .sr-ic.truck{background:var(--fill);color:var(--text)}
+.srow .sr-ic{position:relative}
+.srow .sr-ic .sun{position:absolute;top:-5px;right:-5px;width:17px;height:17px;border-radius:50%;background:var(--solar);color:#3A2A00;display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.srow .sr-ic .sun .ic{width:11px;height:11px;stroke-width:2.6}
+.srow .sr-s .sol{color:var(--day-ink);font-weight:600}
 .srow .sr-t{display:block;font-weight:600;font-size:15px;line-height:1.25}
 .srow .sr-s{display:block;font-size:12.5px;color:var(--muted);margin-top:1px}
 .srow .sr-m{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
@@ -495,13 +572,22 @@ select.input{appearance:none;-webkit-appearance:none;background-image:linear-gra
 .conn{display:flex;align-items:center;gap:11px;width:100%;padding:10px 12px;border-radius:12px;border:0;background:var(--surface);text-align:left;color:var(--text)}
 .conn[aria-checked="true"]{box-shadow:inset 0 0 0 1.5px var(--brand)}
 .conn[disabled]{opacity:.55;cursor:not-allowed}
+/* punctele stației: o singură listă grupată, cu separatoare fine (mai aerisit decât carduri separate) */
+.connlist{background:var(--surface);border-radius:14px;overflow:hidden}
+.connlist .conn{position:relative;border-radius:0;background:transparent;padding:11px 14px}
+.connlist .conn+.conn::before{content:"";position:absolute;top:0;left:63px;right:0;height:.5px;background:var(--sep)}
+.connlist .conn[aria-checked="true"]{box-shadow:none;background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+.connlist .conn[aria-checked="true"]::after{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3.5px;border-radius:0 3px 3px 0;background:var(--brand);animation:dotPop .35s var(--spring)}
+.connlist .conn[disabled] .c-ic,.connlist .conn[disabled] .grow{opacity:.55}
+.connlist .conn[disabled]{opacity:1}
+.connlist .conn:active{transform:none;background:var(--fill)}
 .conn .c-ic{width:38px;height:38px;border-radius:10px;background:var(--fill);display:grid;place-items:center;flex:none}
 .conn .c-ic .ic{width:24px;height:24px;stroke-width:1.5}
 .conn .c-kw{font:650 16px var(--f-round);font-variant-numeric:tabular-nums}
 .conn .c-sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
 .conn .c-sub .mono{font-size:11.5px}
 .conn .c-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:none}
-.sticky-cta{position:sticky;bottom:0;z-index:15;margin-top:12px;padding:10px 16px calc(12px + var(--sab));background:linear-gradient(0deg,var(--bg) 70%,transparent)}
+.sticky-cta{position:sticky;bottom:0;z-index:15;margin-top:16px;padding:10px 16px calc(10px + max(var(--sab), 8px));background:var(--bg);box-shadow:0 -.5px 0 var(--sep),0 -12px 24px -12px rgb(0 0 0 / .12)}
 .pvstats .num{font-size:20px;line-height:1.1}
 .pv-sub{font-size:12px;color:var(--muted);margin-top:1px}
 .num .unit,.unit{font:500 12px var(--f-body);color:var(--muted)}
@@ -735,6 +821,51 @@ p.hint:empty{display:none}
 .onb-3d.ready .onb-icon>div{width:36px!important}
 .veh .v-ic.live-ring{box-shadow:inset 0 0 0 2px var(--brand)}
 
+/* ---------- „Insula dinamică” în aplicație ----------
+   Capsula neagră se lipește de insula fizică a iPhone-ului (sau de insula ramei pe desktop):
+   negru pe negru, deci pare că insula însăși se lărgește și arată încărcarea. */
+.dyn{--dyn-top:11px;--dyn-w:124px;--dyn-h:36px;position:absolute;z-index:66;left:50%;top:var(--dyn-top);transform:translateX(-50%);width:var(--dyn-w);height:var(--dyn-h);border-radius:calc(var(--dyn-h) / 2);background:#000;color:#fff;overflow:hidden;transition:width .55s cubic-bezier(.32,1.35,.5,1),height .55s cubic-bezier(.32,1.25,.5,1),border-radius .55s cubic-bezier(.32,1.2,.5,1),box-shadow .6s ease;font-family:var(--f-body);-webkit-user-select:none;user-select:none}
+.dyn.compact{width:calc(var(--dyn-w) + 76px)}
+.dyn.expanded{width:min(374px,calc(100% - 14px));height:176px;border-radius:46px}
+.dyn.pulse{animation:dynGlow 1.6s ease-out}
+@keyframes dynGlow{0%{box-shadow:0 0 0 0 rgb(114 191 68 / .75)}60%{box-shadow:0 0 0 14px rgb(114 191 68 / 0)}100%{box-shadow:0 0 0 0 rgb(114 191 68 / 0)}}
+.dyn-c{position:absolute;inset:0;border:0;background:transparent;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 9px 0 9px;cursor:pointer;transition:opacity .25s}
+.dyn.expanded .dyn-c{opacity:0;pointer-events:none}
+.dyn-l,.dyn-r{display:flex;align-items:center;gap:4px;font:600 13px var(--f-round);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dyn-l .ic{color:#8BE04E;animation:dynBolt 1.1s ease-in-out infinite}
+@keyframes dynBolt{50%{opacity:.35;transform:scale(.88)}}
+.dyn-r{color:#8BE04E;font-size:12.5px;letter-spacing:-.02em}
+/* compact: inel de baterie cu fulger la stânga camerei, procentul la dreapta (încap lângă ceas) */
+.dyn-l .mini{position:relative;width:21px;height:21px;display:grid;place-items:center}
+.dyn-l .mini svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.dyn-l .mini circle{fill:none;stroke-width:2.6}
+.dyn-l .mini .ic{width:11px;height:11px;position:relative}
+.dyn.done .dyn-l .ic,.dyn.done .dyn-r{color:#6FA8FF}
+.dyn.fee .dyn-l .ic,.dyn.fee .dyn-r{color:#FFB547}
+/* extins: rândul de sus stă de o parte și de alta a camerei; restul, sub ea */
+.dyn-x{position:absolute;inset:0;padding:12px 20px 16px;display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:40px auto 1fr;gap:6px 12px;opacity:0;pointer-events:none;transition:opacity .25s .12s}
+.dyn.expanded .dyn-x{opacity:1;pointer-events:auto}
+.dyn-x .dx-pic{position:relative;grid-row:1;grid-column:1;width:58px;height:38px;border-radius:12px;background:#141814;display:grid;place-items:center;overflow:hidden}
+.dyn-x .dx-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#141814}
+.dyn-x .dx-pic .ic{width:22px;height:22px;color:#8BE04E}
+.dyn-x .dx-soc{grid-row:1;grid-column:3;text-align:right;align-self:center;line-height:1}
+.dyn-x .dx-soc b{display:block;font:700 24px/1 var(--f-round);color:#8BE04E;font-variant-numeric:tabular-nums}
+.dyn-x .dx-soc span{font-size:11px;color:#A7B0A2}
+.dyn-x .dx-mid{grid-row:2;grid-column:1 / 4;display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-width:0}
+.dyn-x .dx-kw{font:700 30px/1 var(--f-round);letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap}
+.dyn-x .dx-kw small{font:600 13px var(--f-body);color:#A7B0A2;margin-left:3px}
+.dyn-x .dx-t{font-size:12px;color:#A7B0A2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;min-width:0}
+.dyn-x .dx-bar{grid-row:3;grid-column:1 / 4;align-self:end;display:flex;flex-direction:column;gap:8px}
+.dyn-x .dx-track{height:7px;border-radius:4px;background:#262B26;overflow:hidden;position:relative}
+.dyn-x .dx-track i{position:absolute;inset:0 auto 0 0;border-radius:4px;background:linear-gradient(90deg,#72BF44,#D4F36B);transition:width .8s ease}
+.dyn-x .dx-track i::after{content:"";position:absolute;inset:0;width:40%;background:linear-gradient(90deg,transparent,rgb(255 255 255 / .6),transparent);animation:socShine 1.6s linear infinite}
+.dyn-x .dx-row{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#A7B0A2}
+.dyn-x .dx-row>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.dyn-x .dx-row button{flex:none;border:0;height:30px;padding:0 14px;border-radius:15px;background:#72BF44;color:#10140F;font:600 12.5px var(--f-body);transition:transform .3s var(--spring)}
+.dyn-x .dx-row button:active{transform:scale(.9);transition-duration:.08s}
+.dyn.done .dx-soc b{color:#6FA8FF}.dyn.fee .dx-soc b{color:#FFB547}
+@media (prefers-reduced-motion:reduce){.dyn{transition:none}.dyn-l .ic{animation:none}}
+
 </style>
 <script type="importmap">{"imports": {"three": "./vendor/three.module.min.js", "three/addons/": "./vendor/addons/"}}</script>
 </head>
@@ -746,6 +877,7 @@ p.hint:empty{display:none}
     <div id="topprobe" aria-hidden="true" style="position:absolute;top:0;left:0;width:1px;height:var(--top);pointer-events:none;visibility:hidden"></div>
     <div class="sbar" aria-hidden="true"><span id="sbtime">12:00</span><span class="sb-ic"><svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg><svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.2 5.6 8.6a3.4 3.4 0 0 1 4.8 0zM3.4 6.4a6.6 6.6 0 0 1 9.2 0l-1.3 1.4a4.7 4.7 0 0 0-6.6 0zM1 4a10 10 0 0 1 14 0l-1.3 1.4a8 8 0 0 0-11.4 0z" fill="currentColor"/></svg><svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="17" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4z" fill="currentColor" opacity=".5"/></svg></span></div>
     <div class="island" aria-hidden="true"></div>
+    <div class="dyn" id="dyn" hidden><button class="dyn-c" id="dynC" aria-label="Încărcare activă: deschide detaliile"><span class="dyn-l"></span><span class="dyn-r"></span></button><div class="dyn-x" id="dynX"></div></div>
     <div class="app" id="app">
       <main class="view" id="view"></main>
       <button class="livepill" id="livepill" hidden aria-label="Deschide încărcarea activă"></button>
@@ -1008,11 +1140,18 @@ function buildWorld() {
 const MODELS3D = {
   suv: { url: 'models/suv.glb', length: 4.75, paint: '#3E444B', paintMats: ['pintura'], glassMats: ['vidro'], port: [0.49, 0.56, -0.4], credit: '„2021 Tesla Model Y” de tonielpro520 (Sketchfab), CC BY 4.0' },
   concept: { url: 'models/concept.glb', length: 4.6, port: [0.5, 0.5, -0.38], credit: '„Car Concept” de Eric Chadwick, © 2024 Darmstadt Graphics Group GmbH, CC BY 4.0 (după Concept Car 004 de Unity Fan, CC0)' },
-  van: { url: 'models/van.glb', length: 5.4, port: [0.5, 0.5, 0.36], credit: '„European Delivery Van” de Evan Hiltz (Sketchfab), CC BY 4.0' },
-  rigid: { url: 'models/rigid.glb', length: 7.2, rotY: -Math.PI / 2, port: [0.5, 0.42, 0.18], credit: '„LCT 3000 ’95 – Low poly model” de Daniel Zhabotinsky (Sketchfab), CC BY 4.0' },
-  compact: { url: 'models/carpack.glb', pick: 'Compact Body', length: 3.7, port: [0.5, 0.52, 0.42], credit: '„Generic passenger car pack” de Comrade1280 (Sketchfab), CC BY 4.0' },
-  hatch: { url: 'models/carpack.glb', pick: 'Hatchback Body', length: 4.2, port: [0.5, 0.52, -0.4], credit: '„Generic passenger car pack” de Comrade1280 (Sketchfab), CC BY 4.0' },
-  crossover: { url: 'models/carpack.glb', pick: 'SUV Body', length: 4.5, port: [0.5, 0.55, -0.4], credit: '„Generic passenger car pack” de Comrade1280 (Sketchfab), CC BY 4.0' },
+  van: { url: 'models/sprinter.glb', length: 5.93, paint: '#E8EBE7', paintMats: ['body_paint'], metal: 0.25, rough: 0.35, glassMats: ['glass'], port: [0.5, 0.42, 0.42], credit: '„Mercedes Sprinter” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
+  atto3: { url: 'models/atto3.glb', length: 4.455, paint: '#8FB6CB', paintMats: ['paint'], metal: 0.45, port: [-0.5, 0.56, -0.36], credit: '„2024 BYD Atto 3 Superior Extended Range” de Nazh Design (Sketchfab), CC BY 4.0' },
+  q8: { url: 'models/q8.glb', length: 4.9, paint: '#2F3B47', paintMats: ['body_paint'], glassMats: ['glass'], hideMats: ['license_plate'], port: [0.5, 0.6, 0.33], credit: '„Audi e-tron” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
+  /* camioane: cap tractor + semiremorcă de 13,6 m (ansamblu TIR); priza CCS/MCS pe stânga, în spatele cabinei */
+  trailer: { url: 'models/trailer.glb', length: 13.6, rotY: Math.PI, plainMats: ['The_texture_of_the_trailer', 'paint_trailer.001'], credit: '„Semi Trailer” de NoblecatSoft (Sketchfab), CC BY 4.0' },
+  tirMan: { url: 'models/tractor_eu.glb', length: 5.95, rotY: 0, hide: ['Text', 'Text.001'], paint: '#E4E7E9', paintMats: ['body'], metal: 0.45, glassMats: ['window'], port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.05 }, credit: '„[XYZ] KR Scania R_Draft” de radzig541 (Sketchfab), CC BY 4.0 — cabină fără însemne, ca MAN eTGX' },
+  tirDaf: { url: 'models/tractor_eu.glb', length: 5.95, rotY: 0, hide: ['Text', 'Text.001'], paint: '#27313C', paintMats: ['body'], metal: 0.5, glassMats: ['window'], port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.05 }, credit: '„[XYZ] KR Scania R_Draft” de radzig541 (Sketchfab), CC BY 4.0 — cabină fără însemne, ca DAF XF' },
+  tirMerc: { url: 'models/tractor_merc.glb', length: 6.9, rotY: Math.PI, paint: '#DADDE0', paintMats: ['body_paint'], metal: 0.4, port: [0.5, 0.33, -0.1], attach: { model: 'trailer', front: 3.1 }, credit: '„European HGV tractor” (CARLA Simulator, carla.org; conversie SimForge), CC BY 4.0' },
+  tirVolvo: { url: 'models/tractor_eu.glb', length: 5.95, rotY: 0, hide: ['Text', 'Text.001'], paint: '#2F6EA8', paintMats: ['body'], metal: 0.5, glassMats: ['window'], port: [0.5, 0.33, -0.12], attach: { model: 'trailer', front: 3.05 }, credit: '„[XYZ] KR Scania R_Draft” de radzig541 (Sketchfab), CC BY 4.0 — cabină fără însemne, ca Volvo FH' },
+  compact: { url: 'models/spring.glb', length: 3.73, paint: '#8A9B7E', paintMats: ['body_paint'], metal: 0.35, glassMats: ['glass'], port: [0.14, 0.5, 0.49], credit: '„2011 Dacia (Renault) Duster” de razor24 (Sketchfab), CC BY 4.0 — la scara unei Dacia Spring' },
+  crossover: { url: 'models/puma.glb', length: 4.21, paint: '#B8322E', paintMats: ['body_paint'], glassMats: ['glass'], port: [0.5, 0.56, -0.37], credit: '„2017 Mini Countryman” de razor24 (Sketchfab), CC BY 4.0 — siluetă de crossover compact' },
+  ix2: { url: 'models/ix2.glb', length: 4.55, paint: '#1E4F9A', paintMats: ['body_paint'], glassMats: ['glass'], port: [-0.5, 0.56, -0.37], credit: '„Lowpoly Generic SUV” de mk2design (Sketchfab), CC BY 4.0 — siluetă de SUV coupé' },
 };
 window.CAR3D_MODELS = MODELS3D;
 const DATA = {
@@ -1149,15 +1288,21 @@ const DATA = {
       curve: [[0, 98], [40, 100], [60, 80], [80, 55], [100, 15]] },
     { id: 'spring', model3d: 'compact', kind: 'car', name: 'Dacia Spring', plate: 'SV 43 RFR', batt: 24.3, maxDc: 40, maxAc: 7, soc: 71, driver: 'Andrei', center: 'Service', range: 220,
       curve: [[0, 38], [60, 38], [80, 30], [100, 8]] },
-    { id: 'etransit', model3d: 'van', kind: 'van', name: 'Ford E-Transit (autonomie extinsă)', plate: 'SV 31 RFR', batt: 89, maxDc: 180, maxAc: 11, soc: 52, driver: 'Mihai', center: 'Distribuție', range: 400,
-      curve: [[0, 178], [40, 176], [60, 140], [80, 95], [100, 20]] },
-    { id: 'eactros', model3d: 'rigid', kind: 'truck', name: 'Mercedes-Benz eActros 600', plate: 'SV 21 RFR', batt: 621, maxDc: 400, maxMcs: 0, mcsSoon: true, maxAc: 22, soc: 38, driver: 'Vasile', center: 'Transport internațional', range: 500,
+    { id: 'atto3', model3d: 'atto3', kind: 'car', name: 'BYD Atto 3', plate: 'SV 44 RFR', batt: 60.5, maxDc: 88, maxAc: 11, soc: 58, driver: 'Cristina', center: 'Vânzări', range: 420,
+      curve: [[0, 86], [30, 88], [50, 80], [70, 60], [85, 40], [100, 10]] },
+    { id: 'q8', model3d: 'q8', kind: 'car', name: 'Audi Q8 e-tron 55', plate: 'SV 45 RFR', batt: 106, maxDc: 170, maxAc: 11, soc: 46, driver: 'Radu', center: 'Vânzări', range: 560,
+      curve: [[0, 168], [60, 170], [70, 150], [80, 120], [90, 70], [100, 15]] },
+    { id: 'ix2', model3d: 'ix2', kind: 'car', name: 'BMW iX2 eDrive20', plate: 'SV 46 RFR', batt: 64.8, maxDc: 130, maxAc: 11, soc: 67, driver: 'Sorin', center: 'Vânzări', range: 470,
+      curve: [[0, 128], [35, 130], [55, 110], [75, 75], [90, 45], [100, 12]] },
+    { id: 'etransit', model3d: 'van', kind: 'van', name: 'Mercedes-Benz eSprinter', plate: 'SV 31 RFR', batt: 113, maxDc: 115, maxAc: 11, soc: 52, driver: 'Mihai', center: 'Distribuție', range: 440,
+      curve: [[0, 112], [45, 115], [60, 100], [80, 70], [100, 18]] },
+    { id: 'eactros', model3d: 'tirMerc', kind: 'truck', name: 'Mercedes-Benz eActros 600', plate: 'SV 21 RFR', batt: 621, maxDc: 400, maxMcs: 0, mcsSoon: true, maxAc: 22, soc: 38, driver: 'Vasile', center: 'Transport internațional', range: 500,
       curve: [[0, 396], [75, 396], [85, 300], [100, 80]] },
-    { id: 'etgx', model3d: 'rigid', kind: 'truck', name: 'MAN eTGX 6×2', plate: 'SV 22 RFR', batt: 616, maxDc: 375, maxMcs: 750, maxAc: 22, soc: 40, driver: 'Gheorghe', center: 'Transport internațional', range: 590,
+    { id: 'etgx', model3d: 'tirMan', kind: 'truck', name: 'MAN eTGX 6×2', plate: 'SV 22 RFR', batt: 616, maxDc: 375, maxMcs: 750, maxAc: 22, soc: 40, driver: 'Gheorghe', center: 'Transport internațional', range: 590,
       curve: [[0, 730], [60, 702], [68, 599], [76, 493], [80, 430], [90, 290], [100, 90]] },
-    { id: 'fh', model3d: 'rigid', kind: 'truck', name: 'Volvo FH Aero Electric', plate: 'SV 23 RFR', batt: 780, maxDc: 350, maxMcs: 700, maxAc: 43, soc: 81, driver: 'Ionuț', center: 'Transport internațional', range: 600,
+    { id: 'fh', model3d: 'tirVolvo', kind: 'truck', name: 'Volvo FH Aero Electric', plate: 'SV 23 RFR', batt: 780, maxDc: 350, maxMcs: 700, maxAc: 43, soc: 81, driver: 'Ionuț', center: 'Transport internațional', range: 600,
       curve: [[0, 700], [55, 690], [70, 560], [80, 450], [100, 120]] },
-    { id: 'daf', model3d: 'rigid', kind: 'truck', name: 'DAF XF Electric', plate: 'SV 24 RFR', batt: 525, maxDc: 325, maxMcs: 0, maxAc: 22, soc: 27, driver: 'Florin', center: 'Distribuție', range: 500,
+    { id: 'daf', model3d: 'tirDaf', kind: 'truck', name: 'DAF XF Electric', plate: 'SV 24 RFR', batt: 525, maxDc: 325, maxMcs: 0, maxAc: 22, soc: 27, driver: 'Florin', center: 'Distribuție', range: 500,
       curve: [[0, 322], [70, 318], [85, 220], [100, 80]] },
   ],
   fleet: {
@@ -1168,13 +1313,13 @@ const DATA = {
     ],
     centers: [
       { name: 'Transport internațional', veh: 3, share: 78 }, { name: 'Distribuție', veh: 2, share: 15 },
-      { name: 'Vânzări', veh: 2, share: 5 }, { name: 'Service', veh: 1, share: 2 },
+      { name: 'Vânzări', veh: 5, share: 5 }, { name: 'Service', veh: 1, share: 2 },
     ],
     live: [
       { veh: 'etgx', station: 'tir', conn: 't1', kw: 724, soc: 40, cap: 750 },
       { veh: 'etransit', station: 'patrauti', conn: 'p2', kw: 11, soc: 52, cap: 11 },
     ],
-    status: { puma: 'Parcat · Suceava', spring: 'În cursă · service Rădăuți', eactros: 'În cursă · E85 spre Siret', fh: 'Parcat · depou', daf: 'În cursă · Fălticeni' },
+    status: { ix2: 'Parcat · Suceava Centru', atto3: 'Parcat · sediu Pătrăuți', q8: 'În cursă · Iași', puma: 'Parcat · Suceava', spring: 'În cursă · service Rădăuți', eactros: 'În cursă · E85 spre Siret', fh: 'Parcat · depou', daf: 'În cursă · Fălticeni' },
   },
   cards: [
     { id: 'c21', style: 'green', holder: 'Adriana Munteanu', veh: 'model-y', emaid: 'RO-TMH-C10A00021-9', uid: '049F4A18B6D381', status: 'active', limit: 2500, daily: 250, used: 1184, types: ['ac', 'dc', 'hpc'], window: 'oricand', maxKwh: 80, form: 'Card', issued: 'mar. 2026', personal: true },
@@ -1230,7 +1375,7 @@ const DAYS = ['duminică', 'luni', 'marți', 'miercuri', 'joi', 'vineri', 'sâmb
 
 /* ---------- stare ---------- */
 const S = {
-  stack: [{ r: 'harta', p: {} }], tab: 'harta',
+  stack: [{ r: 'harta', p: {} }], tab: 'harta', tabStacks: {},
   theme: store.get('theme', 'sistem'),
   account: store.get('account', 'firma'),
   vatMode: store.get('vat', 'cu'),
@@ -1404,8 +1549,23 @@ function keepFocus(fn) {
 
 function go(r, p = {}) { const top = curTop(), el = curScr(); if (el) { top.scroll = el.scrollTop; const hb = $('#hsbody'); if (hb) top.hsScroll = hb.scrollTop; } S.stack.push({ r, p }); render('push'); }
 function back() { if (S.stack.length > 1) { S.stack.pop(); render('pop'); } else tabTo('harta'); }
-function tabTo(t) { S.tab = t; S.stack = [{ r: t, p: {} }]; render('fade'); }
+/* fiecare tab își ține propria stivă și poziția de derulare (ca pe iOS): revii exact unde erai */
+function saveScroll() { const top = curTop(), el = curScr(); if (top && el) { top.scroll = el.scrollTop; const hb = $('#hsbody'); if (hb) top.hsScroll = hb.scrollTop; } }
+function tabTo(t, fresh) {
+  saveScroll();
+  S.tabStacks[S.tab] = S.stack;
+  let st = !fresh && S.tabStacks[t];
+  if (st && st[st.length - 1].r === 'sesiune' && !S.session) st = st.slice(0, -1);
+  S.tab = t; S.stack = st && st.length ? st : [{ r: t, p: {} }];
+  render('fade', true);
+}
 function replaceTo(stack, tab) { if (tab) S.tab = tab; S.stack = stack; render('push'); }
+/* la intrarea într-un ecran, blocurile de conținut urcă pe rând (doar primele, ca să nu întârzie nimic) */
+function stagger(el) {
+  const kids = [...el.querySelectorAll(':scope > .scr-head, :scope > .stack-l > *, :scope > .pad > *, :scope > .pad.stack-l > *, :scope > .st-head, :scope > .live-read, :scope > .socbar')].filter(n => !n.matches('.topbar,.sticky-cta'));
+  kids.slice(0, 9).forEach((n, i) => { n.classList.add('rise-in'); n.style.animationDelay = (30 + i * 40) + 'ms'; n.addEventListener('animationend', () => { n.classList.remove('rise-in'); n.style.animationDelay = ''; }, { once: true }); });
+}
+function shadeUpdate() { const sh = $('#sbshade'), el = curScr(); if (!sh) return; sh.classList.toggle('on', !!el && !el.classList.contains('lock') && el.scrollTop > 4); }
 function unmountScreen() { if (S.unmount) { try { S.unmount(); } catch (e) { /* ignorat */ } S.unmount = null; } }
 /* montează o scenă 3D când modulul e gata; întoarce funcția de demontare */
 function with3D(fn) {
@@ -1414,7 +1574,7 @@ function with3D(fn) {
   if (window.Car3D) go(); else window.addEventListener('car3d-ready', go, { once: true });
   return { get h() { return hd; }, stop() { dead = true; if (hd) hd.destroy(); } };
 }
-function render(anim = 'fade') {
+function render(anim = 'fade', restore = anim === 'pop') {
   closeModal(false);
   unmountScreen();
   const top = curTop(), scr = SCREENS[top.r];
@@ -1424,9 +1584,10 @@ function render(anim = 'fade') {
   el.innerHTML = scr.html(top.p);
   view().replaceChildren(el);
   if (scr.mount) scr.mount(el, top.p);
-  if (anim === 'pop') { if (top.scroll) el.scrollTop = top.scroll; const hb = $('#hsbody'); if (hb && top.hsScroll) hb.scrollTop = top.hsScroll; }
+  if (restore) { if (top.scroll) el.scrollTop = top.scroll; const hb = $('#hsbody'); if (hb && top.hsScroll) hb.scrollTop = top.hsScroll; }
+  if (!restore || !top.scroll) stagger(el);
   S.shownAt = Date.now();
-  chrome();
+  chrome(); shadeUpdate();
   renderRail();
   if (S.kbd) { const h = el.querySelector('h1, h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); } }
 }
@@ -1443,11 +1604,14 @@ function rerender() {
 function chrome() {
   const top = curTop(), scr = SCREENS[top.r];
   $('#tabbar').hidden = scr.tabs === false;
+  const app = $('#app'); app.classList.toggle('tabs-on', scr.tabs !== false); app.classList.toggle('on-scan', top.r === 'scan'); app.classList.toggle('on-map', top.r === 'harta');
   $$('#tabbar [data-tab]').forEach(b => b.setAttribute('aria-current', b.dataset.tab === S.tab ? 'page' : 'false'));
   const pill = $('#livepill');
-  const show = !!S.session && scr.tabs !== false && !scr.noPill && top.r !== 'sesiune';
+  /* cu insula dinamică disponibilă, încărcarea se vede sus, în insulă: fără pastilă în plus jos */
+  const show = !!S.session && scr.tabs !== false && !scr.noPill && top.r !== 'sesiune' && !(typeof islandGeom === 'function' && islandGeom());
   pill.hidden = !show; $('#app').classList.toggle('has-pill', show);
   if (show) livePill();
+  if (typeof islandRender === 'function') islandRender();
 }
 
 /* ---------- componente ---------- */
@@ -1466,7 +1630,7 @@ const WINDOWS = { oricand: 'Oricând', zi: '06:00–22:00', noapte: 'Doar noapte
 const isTruckSt = st => !!st.truck && st.truck.level !== 'nu';
 /* miniatura randată a vehiculului (sau iconița, dacă nu există model 3D) */
 const vehPic = (v, live) => v.model3d ? `<span class="v-ic pic${live ? ' live-ring' : ''}"><img src="${window.ASSET_BASE || ''}img/veh-${v.model3d}.png" alt="" loading="lazy" onerror="this.remove()"></span>` : `<span class="v-ic${live ? ' live' : ''}">${ic(VKIND[v.kind][0], 's26')}</span>`;
-const DRIVERS = { Adriana: 'Adriana Munteanu', Vasile: 'Vasile Rusu', Gheorghe: 'Gheorghe Pavel', 'Ionuț': 'Ionuț Hreniuc', Florin: 'Florin Ciobanu', Mihai: 'Mihai Lungu', Ioana: 'Ioana Rotaru', Andrei: 'Andrei Onu' };
+const DRIVERS = { Sorin: 'Sorin Luca', Cristina: 'Cristina Popa', Radu: 'Radu Iacob', Adriana: 'Adriana Munteanu', Vasile: 'Vasile Rusu', Gheorghe: 'Gheorghe Pavel', 'Ionuț': 'Ionuț Hreniuc', Florin: 'Florin Ciobanu', Mihai: 'Mihai Lungu', Ioana: 'Ioana Rotaru', Andrei: 'Andrei Onu' };
 let uid = 0;
 function topbar(title, o = {}) {
   const left = o.close ? `<button class="iconbtn flat" data-back aria-label="Închide">${ic('chevD')}</button>` : (o.back === false ? '' : `<button class="iconbtn flat" data-back aria-label="Înapoi">${ic('chevL')}</button>`);
@@ -1514,7 +1678,7 @@ function toast(msg, icon = 'checkCircle') {
   const old = $('.toast'); if (old) old.remove();
   const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status');
   t.innerHTML = ic(icon, 's20') + `<span>${msg}</span>`; $('#app').appendChild(t);
-  setTimeout(() => t.remove(), 3400);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 260); }, 3400);
 }
 /* fereastră modală: focus în dialog, fundal inert, focusul revine la buton la închidere */
 let modalOpener = null;
@@ -1538,7 +1702,9 @@ function focusModal(m) {
 }
 function closeModal(restore = true) {
   const m = $('#modal'); if (!m) return;
-  m.remove(); BG_SEL.forEach(s => { const n = $(s); if (n) n.inert = false; });
+  /* foaia coboară animat; id-ul se eliberează imediat, ca o foaie nouă să se poată deschide pe loc */
+  m.id = ''; m.classList.add('out'); setTimeout(() => m.remove(), 250);
+  BG_SEL.forEach(s => { const n = $(s); if (n) n.inert = false; });
   if (restore && modalOpener && modalOpener.isConnected) modalOpener.focus({ preventScroll: true });
   modalOpener = null;
 }
@@ -1567,8 +1733,11 @@ function stationArt(st) {
     : `<path d="M222 28a16 16 0 1 0 11 27 13 13 0 0 1-11-27z" fill="var(--night)"/>`;
   const posts = [96, 150, 204].map((x, i) => `<g><rect x="${x}" y="116" width="26" height="68" rx="7" fill="var(--post)" stroke="var(--line-strong)"/><rect x="${x + 5}" y="124" width="16" height="14" rx="3" fill="${i === 0 ? 'var(--brand)' : 'var(--surface-3)'}"/></g>`).join('');
   const cable = `<path d="M109 150c0 20 10 26 30 26" fill="none" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" opacity=".75"/>`;
+  /* la hub: cap tractor cu cabină avansată (ca MAN, Volvo, DAF) și semiremorcă cu trei axe */
   const veh = truck
-    ? `<g fill="var(--vehicle)"><rect x="110" y="134" width="150" height="42" rx="6"/><path d="M260 142h24l16 18v16h-40z"/><path d="M268 148h14l9 10h-23z" fill="var(--vehicle-glass)"/></g><g fill="var(--ink)"><circle cx="138" cy="180" r="9"/><circle cx="166" cy="180" r="9"/><circle cx="284" cy="180" r="9"/></g>`
+    ? `<g fill="var(--vehicle)"><rect x="88" y="110" width="182" height="60" rx="4"/><rect x="96" y="169" width="176" height="6" rx="2"/><path d="M280 118h28c6 0 9 3 10.5 8.5l5.5 27.5v22h-44z"/><rect x="268" y="160" width="16" height="12" rx="2"/></g>
+       <path d="M303 125h7c3 0 5 2 5.8 5.2l2.6 14.8h-15.4z" fill="var(--vehicle-glass)"/><rect x="88" y="110" width="182" height="5" rx="2" fill="var(--brand)"/>
+       <g fill="var(--ink)"><circle cx="118" cy="180" r="9"/><circle cx="139" cy="180" r="9"/><circle cx="160" cy="180" r="9"/><circle cx="292" cy="180" r="9"/><circle cx="315" cy="180" r="9"/></g>`
     : `<g><path d="M132 178v-13c0-5 3-8 7-9l14-4 12-12c3-3 7-4 11-4h32c5 0 9 2 12 5l12 13 16 3c4 1 7 4 7 9v12z" fill="var(--vehicle)"/><path d="M170 140h22v14h-36zM198 140h14c3 0 5 1 7 3l9 11h-30z" fill="var(--vehicle-glass)"/></g><g fill="var(--ink)"><circle cx="160" cy="180" r="9"/><circle cx="226" cy="180" r="9"/></g>`;
   const grid = Array.from({ length: 9 }, (_, i) => `<line x1="${54 + i * 32}" y1="${(99 - i * 2.9).toFixed(1)}" x2="${58 + i * 32}" y2="${(113 - i * 2.9).toFixed(1)}" stroke="var(--panel-line)" stroke-width="1.4"/>`).join('');
   const batt = st.batt ? `<g><rect x="338" y="136" width="36" height="48" rx="6" fill="var(--surface)" stroke="var(--line-strong)"/><path d="M359 146l-7 12h8l-6 12" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>` : '';
@@ -1666,12 +1835,12 @@ function passFilter(st) {
 function stationRow(st) {
   const trucks = S.filter === 'camioane', pn = priceNowFrom(st, trucks), fc = freeCount(st, c => (trucks ? isTruckCls(c.cls) : true)), ns = noSignal(st);
   const badge = ns ? stBadge('nosig', `Fără semnal · ${st.conns[0].lastSeen}${NB}min`) : fc ? stBadge('free', fc === 1 ? '1 liber' : `${fc} libere`) : stBadge('busy', 'Toate ocupate');
-  const sol = solarOn(st) ? `<span class="tag tag-solar">${ic('sun', 's16')}${pvNow(st)}${NB}kW solar</span>` : '';
-  return `<button class="srow${S.sel === st.id ? ' sel' : ''}" data-act="pickStation" data-id="${st.id}">
-    <span class="sr-ic${isTruckSt(st) ? ' truck' : ''}">${ic(isTruckSt(st) ? 'truck' : 'bolt', 's26')}</span>
+  const sol = solarOn(st) ? `<span class="sun" title="${pvNow(st)} kW din panouri acum">${ic('sun')}</span>` : '';
+  return `<button class="srow${S.sel === st.id ? ' sel' : ''}" data-act="pickStation" data-id="${st.id}" aria-label="${esc(st.name)}${solarOn(st) ? `, ${pvNow(st)} kW din panouri acum` : ''}">
+    <span class="sr-ic${isTruckSt(st) ? ' truck' : ''}">${ic(isTruckSt(st) ? 'truck' : 'bolt', 's26')}${sol}</span>
     <span class="grow"><span class="sr-t">${esc(st.name)}</span>
       <span class="sr-s">${nf(distKm(st), 1)}${NB}km · ${dur(etaMin(st))} · ${esc(st.city)}</span>
-      <span class="sr-m">${plugSummary(st).filter(g => !trucks || isTruckCls(g.cls)).slice(0, 2).map(g => `<span class="tag">${ic(PLUG[g.type][0], 's16')}${kwLabel(g.kw)} <span class="cnt">${g.free}/${g.n}</span></span>`).join('')}${sol}</span></span>
+      <span class="sr-m">${plugSummary(st).filter(g => !trucks || isTruckCls(g.cls)).slice(0, 2).map(g => `<span class="tag">${ic(PLUG[g.type][0], 's16')}${kwLabel(g.kw)} <span class="cnt">${g.free}/${g.n}</span></span>`).join('')}</span></span>
     <span class="sr-p"><b>${nf(shown(pn.cls, pn.p), 2)}</b><span>lei/kWh ${T.classes[pn.cls].short}${isNet(pn.cls) ? ' net' : ''}</span>${badge}</span></button>`;
 }
 function selCard(st) {
@@ -1680,8 +1849,8 @@ function selCard(st) {
     <div class="between"><div class="grow"><div class="eyebrow">${isTruckSt(st) ? 'Stație pentru camioane' : 'Stație selectată'}</div><h3 class="h-sec" style="margin-top:3px">${esc(st.name)}</h3><div class="muted" style="font-size:13px">${esc(st.addr)}, ${esc(st.city)}</div></div>
       <button class="iconbtn flat" data-act="unselect" aria-label="Închide stația selectată">${ic('x', 's20')}</button></div>
     <div class="hrow wrap" style="gap:6px">${plugSummary(st).map(g => `<span class="tag">${ic(PLUG[g.type][0], 's16')}${PLUG[g.type][1]} ${kwLabel(g.kw)} · ${g.free}/${g.n}</span>`).join('')}</div>
-    <div class="hrow wrap" style="gap:6px"><span class="tag ${bandTag(b)}">${ic(bandIcon(b), 's16')}${bandLabel(b)}</span>${kw ? `<span class="tag tag-solar">${ic('panel', 's16')}${kw}${NB}kW din panouri acum</span>` : `<span class="tag">${ic('moon', 's16')}Panourile nu produc acum</span>`}${isTruckSt(st) ? `<span class="tag">${ic('arrowsH', 's16')}${TRUCK[st.truck.level]}</span>` : ''}</div>
-    <div class="hrow" style="gap:8px"><button class="btn btn-primary grow" data-go="statie" data-id="${st.id}">${ic('bolt', 's20')}Încarcă aici</button><a class="btn btn-ghost" href="${navHref(st)}" target="_blank" rel="noopener">${ic('nav', 's20')}${dur(etaMin(st))}</a></div></div>`;
+    <div class="muted" style="font-size:13px">${bandLabel(b)} · ${priceStr(priceNowFrom(st, false).cls, priceNowFrom(st, false).p)}${kw ? ` · ${kw}${NB}kW din panouri acum` : ''}${isTruckSt(st) ? ` · ${TRUCK[st.truck.level]}` : ''}</div>
+    <div class="hrow" style="gap:8px"><button class="btn btn-ghost" data-act="nav" data-id="${st.id}" aria-label="Navighează, ${dur(etaMin(st))}">${ic('nav', 's20')}${dur(etaMin(st))}</button><button class="btn btn-primary grow" data-go="statie" data-id="${st.id}">${ic('bolt', 's20')}Încarcă aici</button></div></div>`;
 }
 function liveCardSheet() {
   const s = S.session; if (!s) return '';
@@ -1704,9 +1873,7 @@ function homeSheetBody() {
   const empty = !list.length && !far.length;
   const emptyMsg = q ? `Nicio stație pentru „${esc(q)}”. Verifică numele sau codul.` : `Nicio stație nu se potrivește filtrului. Încearcă fără „${FILTERS.find(f => f[0] === S.filter)[1]}”.`;
   return `<div class="stack" style="gap:12px">
-    ${liveCardSheet()}
-    ${sel ? selCard(sel) : ''}
-    ${nowbar()}
+    ${sel ? selCard(sel) : liveCardSheet() + nowbar()}
     ${empty ? `<div class="note">${ic('search')}<span>${emptyMsg}</span>${q ? `<button class="link" data-act="clearSearch">Șterge</button>` : ''}</div>` : ''}
     ${list.length ? `<div class="sec-head" style="padding-top:2px"><h3 class="h-sec">Aproape de tine</h3><span class="muted" style="font-size:13px">${plural(list.length, 'stație', 'stații')}</span></div>${list.map(stationRow).join('')}` : ''}
     ${far.length ? `<div class="sec-head"><h3 class="h-sec">În județ</h3><span class="muted" style="font-size:13px">${plural(far.length, 'stație', 'stații')}</span></div>${far.map(stationRow).join('')}` : ''}
@@ -1786,10 +1953,17 @@ SCREENS.statie = {
       <h1 class="h-screen" style="font-size:28px">${esc(st.name)}</h1>
       <div class="muted" style="font-size:14px">${esc(st.addr)}, ${esc(st.city)} · ${nf(distKm(st), 1)}${NB}km</div>
       <div class="faint-t" style="font-size:12px;font-weight:650" data-live="updated">${statusLine}</div>
-      <div class="hrow" style="gap:8px;margin-top:6px"><a class="btn btn-dark grow" href="${navHref(st)}" target="_blank" rel="noopener">${ic('nav', 's20')}Navighează · ${dur(etaMin(st))}</a>${myResHere && !S.myRes.bay ? `<button class="btn btn-ghost" data-act="cancelRes">${ic('x', 's20')}Anulează rezervarea</button>` : `<button class="btn btn-ghost" data-act="reserve" data-id="${st.id}">${ic('timer', 's20')}Rezervă 15 min</button>`}</div>
+      <div class="hrow" style="gap:8px;margin-top:6px"><button class="btn btn-dark grow" data-act="nav" data-id="${st.id}">${ic('nav', 's20')}Navighează · ${dur(etaMin(st))}</button>${myResHere && !S.myRes.bay ? `<button class="btn btn-ghost" data-act="cancelRes">${ic('x', 's20')}Anulează rezervarea</button>` : `<button class="btn btn-ghost" data-act="reserve" data-id="${st.id}">${ic('timer', 's20')}Rezervă 15 min</button>`}</div>
     </div>
     <div class="stack-l" style="padding-top:12px">
       ${st.cold ? `<div class="pad"><div class="note night">${ic('info')}<span>Iarna aici sunt până la −20${NB}°C. Precondiționează bateria înainte de sosire ca să încarci la viteză maximă.</span></div></div>` : ''}
+      <section class="sec"><div class="sec-head"><h3 class="h-sec" id="connh">Alege punctul de încărcare</h3><span class="muted" style="font-size:13px">${plural(st.conns.length, 'punct', 'puncte')}</span></div>
+        <div class="connlist" role="radiogroup" aria-labelledby="connh">${st.conns.map(k => connRow(k, p.conn)).join('')}</div></section>
+      ${trucks}
+      <section class="sec"><div class="sec-head"><h3 class="h-sec">Tarife</h3><button class="link" data-go="tarife">Detalii</button></div>
+        <div class="card p stack">${dayline()}
+          <div class="list flat">${stClasses(st).map(cl => `<div class="row" style="min-height:50px"><span class="grow"><span class="r-title" style="font-size:14px">${T.classes[cl].label}</span>${isNet(cl) ? `<span class="r-sub">fără TVA · cu TVA ${nf(T.classes[cl].zi, 2)} / ${nf(T.classes[cl].noapte, 2)}</span>` : ''}</span><span class="pcol">${priceTags(cl, b)}</span></div>`).join('')}</div>
+          <div class="note">${ic('info')}<span>Lei/kWh${S.vatMode === 'fara' ? ' fără TVA' : `, cu TVA ${T.vat}% (camioanele fără TVA)`}. Fiecare kWh se plătește la prețul intervalului în care e livrat. ${solarSeason() ? `Între ${pad2(T.solarHour.from)}:00 și ${pad2(T.solarHour.to)}:00, din aprilie până în septembrie, AC și DC rapid au preț de noapte. ` : ''}${stationIdleNote(st)}</span></div></div></section>
       ${st.pv ? `<section class="sec"><div class="sec-head"><h3 class="h-sec">Energie solară acum</h3><span class="tag tag-solar">${ic('sun', 's16')}${solarPct(st)}% din vârf</span></div>
         <div class="card p stack">
           <div class="kv3 pvstats"><div><div class="eyebrow">Panouri</div><div class="num">${kw}<small class="unit">${NB}kW</small></div><div class="pv-sub">din ${st.pv.kwp}${NB}kWp</div></div>
@@ -1799,13 +1973,6 @@ SCREENS.statie = {
           <div class="mix" aria-hidden="true"><span style="width:${share}%;background:var(--solar)"></span><span style="width:${battShare}%;background:var(--batt)"></span><span style="flex:1;background:var(--grid)"></span></div>
           <div class="legend"><span><i style="background:var(--solar)"></i>Panouri</span><span><i style="background:var(--batt)"></i>Baterie încărcată solar</span><span><i style="background:var(--grid)"></i>Rețea</span></div>
         </div></section>` : ''}
-      <section class="sec"><div class="sec-head"><h3 class="h-sec" id="connh">Alege punctul de încărcare</h3><span class="muted" style="font-size:13px">${plural(st.conns.length, 'punct', 'puncte')}</span></div>
-        <div class="stack" style="gap:8px" role="radiogroup" aria-labelledby="connh">${st.conns.map(k => connRow(k, p.conn)).join('')}</div></section>
-      <section class="sec"><div class="sec-head"><h3 class="h-sec">Tarife</h3><button class="link" data-go="tarife">Detalii</button></div>
-        <div class="card p stack">${dayline()}
-          <div class="list flat">${stClasses(st).map(cl => `<div class="row" style="min-height:50px"><span class="grow"><span class="r-title" style="font-size:14px">${T.classes[cl].label}</span>${isNet(cl) ? `<span class="r-sub">fără TVA · cu TVA ${nf(T.classes[cl].zi, 2)} / ${nf(T.classes[cl].noapte, 2)}</span>` : ''}</span><span class="pcol">${priceTags(cl, b)}</span></div>`).join('')}</div>
-          <div class="note">${ic('info')}<span>Lei/kWh${S.vatMode === 'fara' ? ' fără TVA' : `, cu TVA ${T.vat}% (camioanele fără TVA)`}. Fiecare kWh se plătește la prețul intervalului în care e livrat. ${solarSeason() ? `Între ${pad2(T.solarHour.from)}:00 și ${pad2(T.solarHour.to)}:00, din aprilie până în septembrie, AC și DC rapid au preț de noapte. ` : ''}${stationIdleNote(st)}</span></div></div></section>
-      ${trucks}
       ${st.truck && st.truck.note ? `<div class="pad"><div class="note">${ic('van')}<span>${esc(st.truck.note)}.</span></div></div>` : ''}
       <section class="sec"><div class="sec-head"><h3 class="h-sec">Facilități</h3></div><div class="hrow wrap" style="gap:8px">${st.amen.map(a => `<span class="tag tag-md">${ic(AMEN[a][0], 's16')}${AMEN[a][1]}</span>`).join('')}</div></section>
       <section class="sec"><div class="list">${row({ icon: 'building', title: 'Operator', sub: `${DATA.company.name} · CUI ${DATA.company.cui}` })}${row({ icon: 'card', title: 'Metode de plată', sub: 'Aplicație, card RFID, card bancar contactless la stație' })}${row({ icon: 'warn', title: 'Raportează o problemă', sub: 'Punct defect, loc blocat, cablu deteriorat', act: 'report' })}</div></section>
@@ -1850,7 +2017,7 @@ function openStart(stId, connId, vehPref) {
     const t0 = st0.wait ? (() => { const d = new Date(now); d.setHours(T.nightStart, 0, 0, 0); return d; })() : now;
     const sim = simulate(v, c, from, tgt, t0), nxt = nextPriceChange(c.cls), pay = byId(pays, st0.pay), lim = limitedBy(v, c);
     const noun = NOUN[v.kind][0];
-    const vehItems = vs.slice(0, 5).map(x => { const busy = vehBusy(x); return `<button type="button" class="opt" data-sv="veh" data-v="${x.id}" role="radio" aria-checked="${x.id === st0.veh}" ${busy ? 'disabled' : ''}><span class="radio"></span><span class="tile">${ic(VKIND[x.kind][0], 's20')}</span><span class="grow"><b style="display:block">${esc(x.name)}</b><span class="muted" style="font-size:13px">${x.plate} · ${busy ? 'se încarcă acum' : Math.floor(vehSoc(x)) + '% · până la ' + connCap(x, c) + NB + 'kW aici'}</span></span></button>`; });
+    const vehItems = vs.slice(0, 7).map(x => { const busy = vehBusy(x); return `<button type="button" class="opt" data-sv="veh" data-v="${x.id}" role="radio" aria-checked="${x.id === st0.veh}" ${busy ? 'disabled' : ''}><span class="radio"></span><span class="tile">${ic(VKIND[x.kind][0], 's20')}</span><span class="grow"><b style="display:block">${esc(x.name)}</b><span class="muted" style="font-size:13px">${x.plate} · ${busy ? 'se încarcă acum' : Math.floor(vehSoc(x)) + '% · până la ' + connCap(x, c) + NB + 'kW aici'}</span></span></button>`; });
     const payItems = pays.map(p => `<button type="button" class="opt" data-sv="pay" data-v="${p.id}" role="radio" aria-checked="${p.id === st0.pay}" ${p.ok ? '' : 'disabled'}><span class="radio"></span><span class="grow"><b style="display:block">${esc(p.label)}</b><span class="muted" style="font-size:12.5px">${esc(p.ok ? p.sub : p.why)}</span></span>${ic(p.icon, 's20')}</button>`);
     const tagB = st0.wait ? 'noapte' : curB;
     return `<div class="stack" style="gap:14px">
@@ -1860,17 +2027,17 @@ function openStart(stId, connId, vehPref) {
       ${lim ? `<div class="note ${lim.by === 'car' ? '' : 'brand'}">${ic('gauge')}<span>${lim.by === 'car' ? `${noun} acceptă maximum ${lim.car}${NB}kW, deși stația poate mai mult.` : `Limitat de stație: ${kwLabel(lim.st)}. ${VKIND[v.kind][1]} acceptă ${lim.car}${NB}kW.`}</span></div>` : ''}
       <div class="field"><label for="tgt">Încarcă până la <b class="tnum" id="tgtv">${tgt}%</b></label><input class="range" id="tgt" type="range" min="${minT}" max="100" step="5" value="${tgt}">${rangeLabels(minT + '%', '100%', 'acum ' + Math.floor(from) + '%')}</div>
       <div class="kv3">${stat('Timp', dur(sim.min))}${stat('Energie', nf(sim.kwh, 1), 'kWh')}${stat('Cost', nf(shown(c.cls, sim.cost), 0), 'lei', isNet(c.cls) ? 'fără TVA' : 'estimat')}</div>
+      ${radios('Plată', payItems)}
       <div class="card p stack pricecard" style="gap:8px">
         <div class="between"><b>Preț garantat pentru această sesiune</b><span class="tag ${bandTag(tagB)}">${ic(bandIcon(tagB), 's16')}${bandLabel(tagB)}</span></div>
         <p style="font-size:14px">${st0.wait ? `Pornește la ${pad2(T.nightStart)}:00 și plătești ${priceStr(c.cls, nightP)}.` : `Acum plătești <b>${priceStr(c.cls, curP)}</b>.${nxt && sim.end > nxt.at ? ` De la ${hhmm(nxt.at)} plătești ${priceStr(c.cls, nxt.price)}; estimarea ține cont de asta.` : nxt ? ` De la ${hhmm(nxt.at)}: ${priceStr(c.cls, nxt.price)}.` : ''}`}</p>
         <p class="muted" style="font-size:13px">${idleRule(c.cls)}</p>
         <p class="muted" style="font-size:13px">${pay.hold ? `Blocăm temporar ${pay.hold}${NB}lei pe card. Plătești doar ce consumi, iar restul se deblochează imediat.` : pay.kind === 'fleet' ? 'Fără sumă blocată: energia intră pe factura lunară a firmei.' : 'Fără sumă blocată: plata se face din contul cardului RFID.'}</p></div>
-      ${radios('Plată', payItems)}
       ${canWait ? `<label class="opt" style="cursor:pointer"><span class="tile night">${ic('moon', 's20')}</span><span class="grow"><b style="display:block">Pornește la tarif de noapte</b><span class="muted" style="font-size:12.5px">Automat la ${pad2(T.nightStart)}:00 · ${priceStr(c.cls, nightP)} (−${waitSave}%)</span></span>${swc('wait', st0.wait, 'Pornește la tarif de noapte')}</label>`
         : band() === 'noapte' ? `<div class="note night">${ic('moon')}<span>Acum e tarif de noapte: ${priceStr(c.cls, nightP)} până la ${pad2(T.nightEnd)}:00.</span></div>`
         : `<div class="note" style="background:var(--solar-soft)">${ic('panel')}<span>Acum plătești deja prețul de noapte, până la ${pad2(T.solarHour.to)}:00.</span></div>`}
-      ${slider('startSlide', st0.wait ? 'Glisează pentru a programa' : 'Glisează pentru a porni încărcarea')}
-      <p class="muted" style="font-size:12.5px;text-align:center">Conectează cablul la ${NOUN[v.kind][1]} înainte să glisezi.</p></div>`;
+      <div class="sheet-cta">${slider('startSlide', st0.wait ? 'Glisează pentru a programa' : 'Glisează pentru a porni încărcarea')}
+      <p class="muted" style="font-size:12.5px;text-align:center">Conectează cablul la ${NOUN[v.kind][1]} înainte să glisezi · ${dur(sim.min)} · ~${nf(shown(c.cls, sim.cost), 0)}${NB}lei</p></div></div>`;
   };
   const mountIt = m => {
     const box = m.querySelector('.msheet'), hid = m.querySelector('.msheet').getAttribute('aria-labelledby');
@@ -1970,12 +2137,12 @@ SCREENS.sesiune = {
     <p class="hint pad" data-live="hint">${hintLine(s)}</p>
     <div class="stack-l" style="padding-top:14px">
       <div class="kv pad">${stat('Energie livrată', `<span data-live="kwh">${nf(s.kwh, 1)}</span>`, 'kWh')}${stat('Cost până acum', costTile(s), 'lei', `<span data-live="costsub">${costSub(s)}</span>`)}${stat('Durată', `<span data-live="time">${clock(s.t)}</span>`)}${stat('Tarif acum', `<span data-live="price">${nf(shown(s.cls, sessPrice(s, nowB)), 2)}</span>`, 'lei/kWh', `<span data-live="bandlbl">${bandLabel(nowB)}</span>`)}</div>
+      <section class="sec" data-live="bandnote">${bandNote(s)}</section>
+      <section class="sec">${slider('stopSlide', s.done ? 'Glisează pentru a încheia' : 'Glisează pentru a opri', true)}<p class="muted" style="font-size:12.5px;text-align:center;margin-top:8px">Poți opri și apropiind cardul RFID de stație. Pentru ajutor, apasă butonul „?” de sus.</p></section>
       <section class="sec"><div class="card p stack"><div class="between"><h3 class="h-sec" style="font-size:17px">Putere livrată</h3><span class="tag tnum" data-live="peak">vârf ${Math.round(Math.max(...s.hist.map(h => h[1]), s.kw))}${NB}kW</span></div><div data-live="chart">${powerChart(s)}</div></div></section>
       <section class="sec"><div class="card p stack"><div class="between"><h3 class="h-sec" style="font-size:17px">De unde vine energia</h3><span class="tag tag-solar" data-live="solartag">${ic('sun', 's16')}${s.solar}%${NB}solar</span></div>
         <div class="mix" data-live="mix">${mixBars(s)}</div><div class="legend"><span><i style="background:var(--solar)"></i>Panourile stației</span><span><i style="background:var(--batt)"></i>Baterie încărcată solar</span><span><i style="background:var(--grid)"></i>Rețea</span></div></div></section>
-      <section class="sec" data-live="bandnote">${bandNote(s)}</section>
       <section class="sec"><div class="list">${row({ icon: VKIND[v.kind][0], title: esc(v.name), sub: `${v.plate} · până la ${s.cap}${NB}kW aici` })}${row({ icon: pay.icon, title: esc(pay.label), sub: esc(pay.sub) })}${row({ icon: 'hash', title: 'Punct de încărcare', sub: `<span class="mono">${c.evse}</span> · ${PLUG[c.type][1]} ${kwLabel(c.kw)}` })}</div></section>
-      <section class="sec">${slider('stopSlide', s.done ? 'Glisează pentru a încheia' : 'Glisează pentru a opri', true)}<p class="muted" style="font-size:12.5px;text-align:center;margin-top:8px">Poți opri și apropiind cardul RFID de stație. Pentru ajutor, apasă butonul „?” de sus.</p></section>
     </div>`;
   },
   mount(el) {
@@ -2090,7 +2257,7 @@ function vehStatus(v) {
 function driversWithoutCard() {
   return DATA.vehicles.filter(v => !S.cards.some(c => c.veh === v.id && c.status !== 'blocked') && !S.cards.some(c => (c.pool || []).includes(v.id) && c.status !== 'blocked'));
 }
-const noCardText = list => list.map(v => `${esc(v.driver)} (${esc(v.name.replace(/^(Mercedes-Benz|Ford|Tesla|Dacia|MAN|Volvo|DAF) /, ''))})`).join(', ');
+const noCardText = list => list.map(v => `${esc(v.driver)} (${esc(v.name.replace(/^(Mercedes-Benz|Ford|Tesla|Dacia|MAN|Volvo|DAF|BYD|Audi|BMW) /, ''))})`).join(', ');
 SCREENS.flota = {
   html() {
     if (S.account !== 'firma') return `<div class="scr-head"><div class="eyebrow">Cont personal</div><h1 class="h-screen">Flotă</h1></div>
@@ -2109,7 +2276,7 @@ SCREENS.flota = {
       <div class="kv pad">${stat('Cost septembrie', nf(cost), 'lei', 'fără TVA, până azi')}${stat('Energie', nf(kwh / 1000, 1), 'MWh', '486 sesiuni')}${stat('Din tariful de noapte', Math.round(nShare), '%', `${dpp >= 0 ? '+' : '−'}${Math.abs(dpp)} pp față de ${pm.m.toLowerCase()}.`)}${stat('Energie solară', 38, '%', 'panouri + baterii')}</div>
       <section class="sec"><div class="card p stack" style="gap:8px"><div class="between"><b>${tier[0]} · −${tier[2]}%</b><span class="muted tnum" style="font-size:13px">${lei(cost, 0)} din ${lei(F.cap, 0)}</span></div><div class="bar"><i style="width:${cost / F.cap * 100}%"></i></div><span class="muted" style="font-size:12.5px">Plafon lunar al companiei. Se aplică cea mai strictă limită dintre companie, card și șofer.</span></div></section>
       <section class="sec"><div class="sec-head"><h3 class="h-sec">Se încarcă acum</h3><span class="st st-live">${liveList.length} live</span></div>
-        <div class="list">${liveList.map(({ v, s }) => `<button class="veh" data-go="vehicul" data-id="${v.id}"><span class="v-ic live">${ic(VKIND[v.kind][0], 's26')}</span><span class="grow"><b class="ellip">${esc(v.name)}</b><span class="muted ellip" style="font-size:13px">${esc(station(s.st).name)} · ${esc(v.driver)}</span><div class="bar" style="margin-top:7px"><i data-live="fsoc-${v.id}" style="width:${s.soc}%"></i></div></span><span class="kwcol"><b class="num" style="font-size:20px" data-live="fkw-${v.id}">${Math.round(s.kw)}</b><span class="muted" style="font-size:12px">kW</span></span></button>`).join('')}</div></section>
+        <div class="list">${liveList.map(({ v, s }) => `<button class="veh" data-go="vehicul" data-id="${v.id}">${vehPic(v, true)}<span class="grow"><b class="ellip">${esc(v.name)}</b><span class="muted ellip" style="font-size:13px">${esc(station(s.st).name)} · ${esc(v.driver)}</span><div class="bar" style="margin-top:7px"><i data-live="fsoc-${v.id}" style="width:${s.soc}%"></i></div></span><span class="kwcol"><b class="num" style="font-size:20px" data-live="fkw-${v.id}">${Math.round(s.kw)}</b><span class="muted" style="font-size:12px">kW</span></span></button>`).join('')}</div></section>
       <section class="sec"><div class="sec-head"><h3 class="h-sec">Vehicule</h3><span class="muted" style="font-size:13px">${DATA.vehicles.length} în flotă</span></div>
         <div class="chips bleed">${[['toate', 'Toate'], ['car', 'Autoturisme'], ['van', 'Dube'], ['truck', 'Camioane']].map(([v, l]) => `<button class="chip" data-act="vehFilter" data-v="${v}" aria-pressed="${fv === v}">${v !== 'toate' ? ic(VKIND[v][0]) : ''}${l}</button>`).join('')}</div>
         <div class="list">${vs.map(v => { const s = vehStatus(v); return `<button class="veh" data-go="vehicul" data-id="${v.id}">${vehPic(v, s.live)}<span class="grow"><b class="ellip">${esc(v.name)}</b><span class="hrow" style="gap:8px;margin-top:3px"><span class="plate">${v.plate}</span><span class="muted" style="font-size:12.5px">${esc(v.driver)}</span></span><span class="muted ellip" style="font-size:12.5px;margin-top:4px">${s.t}</span></span><span class="soccol"><b class="tnum">${Math.floor(s.soc)}%</b><div class="bar${s.soc < 25 ? ' low' : ''}" style="margin-top:6px"><i style="width:${s.soc}%"></i></div></span></button>`; }).join('')}</div></section>
@@ -2351,7 +2518,7 @@ SCREENS.plati = { tabs: false, html: () => `${topbar('Metode de plată')}<div cl
 SCREENS.limba = { tabs: false, html: () => `${topbar('Limbă')}<div class="pad stack-l">${radios('Limba aplicației', [['ro', 'Română', 'Disponibilă'], ['en', 'English', 'În lucru'], ['hu', 'Magyar', 'În lucru'], ['uk', 'Українська', 'În lucru, pentru șoferii din vama Siret']].map(([k, t, d]) => `<button class="opt" data-act="${k === 'ro' ? 'noop' : 'soon'}" role="radio" aria-checked="${k === 'ro'}"><span class="radio"></span><span class="grow"><b style="display:block">${t}</b><span class="muted" style="font-size:12.5px">${d}</span></span></button>`))}</div>` };
 SCREENS.limita = { tabs: false, html: () => `${topbar('Limită implicită')}<div class="pad stack-l"><p class="muted">Nivelul la care se oprește încărcarea dacă nu alegi altul. Peste 80% viteza scade mult, iar bateria ține mai mult dacă nu o umpli zilnic.</p><div class="card p stack"><div class="between"><label for="deftgt" style="font-weight:750">Oprește la</label><b class="num" style="font-size:26px" id="deftgtv">${S.defTarget}%</b></div><input class="range" id="deftgt" type="range" min="50" max="100" step="5" value="${S.defTarget}">${rangeLabels('50%', '100%')}</div></div>` };
 SCREENS.confidentialitate = { tabs: false, html: () => `${topbar('Confidențialitate')}<div class="pad stack-l"><div class="list">${[['loc', 'Locația cât folosești aplicația', 'Pentru stațiile din apropiere și timpul de drum'], ['stats', 'Statistici anonime', 'Ne ajută să reparăm erorile mai repede'], ['mkt', 'Oferte pe e-mail', 'Promoții Termohabitat Fotovoltaice, cel mult o dată pe lună']].map(([k, t, d]) => row({ title: t, sub: d, right: swc('pv-' + k, S.privacy[k], t), chev: false })).join('')}</div><div class="list">${row({ icon: 'download', title: 'Descarcă datele mele', sub: 'Primești o arhivă pe e-mail în 48 de ore', act: 'soon' })}${row({ icon: 'x', tile: 'fault', title: 'Șterge contul', sub: 'Facturile rămân păstrate cât cere legea', act: 'soon' })}</div></div>` };
-SCREENS.vehicule = { tabs: false, html: () => `${topbar('Vehicule')}<div class="pad stack-l"><div class="list">${myVehicles().map(v => `<button class="veh" data-go="vehicul" data-id="${v.id}"><span class="v-ic">${ic(VKIND[v.kind][0], 's26')}</span><span class="grow"><b class="ellip">${esc(v.name)}</b><span class="muted" style="font-size:12.5px">${v.plate} · ${nf(v.batt, v.batt % 1 ? 1 : 0)}${NB}kWh · DC ${v.maxMcs || v.maxDc}${NB}kW · AC ${v.maxAc}${NB}kW</span></span><span class="faint">${ic('chevR', 's18')}</span></button>`).join('')}</div><button class="btn btn-ghost btn-lg btn-block" data-act="soon">${ic('plus', 's20')}Adaugă vehicul</button><p class="muted" style="font-size:12.5px">La camioane salvăm lungimea, înălțimea și poziția prizei, ca să vezi doar locurile potrivite.</p></div>` };
+SCREENS.vehicule = { tabs: false, html: () => `${topbar('Vehicule')}<div class="pad stack-l"><div class="list">${myVehicles().map(v => `<button class="veh" data-go="vehicul" data-id="${v.id}">${vehPic(v)}<span class="grow"><b class="ellip">${esc(v.name)}</b><span class="muted" style="font-size:12.5px">${v.plate} · ${nf(v.batt, v.batt % 1 ? 1 : 0)}${NB}kWh · DC ${v.maxMcs || v.maxDc}${NB}kW · AC ${v.maxAc}${NB}kW</span></span><span class="faint">${ic('chevR', 's18')}</span></button>`).join('')}</div><button class="btn btn-ghost btn-lg btn-block" data-act="soon">${ic('plus', 's20')}Adaugă vehicul</button><p class="muted" style="font-size:12.5px">La camioane salvăm lungimea, înălțimea și poziția prizei, ca să vezi doar locurile potrivite.</p></div>` };
 SCREENS.facturare = { tabs: false, html: () => `${topbar('Date firmă și facturare')}<div class="pad stack-l">
   <div class="list">${row({ icon: 'building', title: DATA.fleet.name, sub: `CUI ${DATA.fleet.cui} · date exemplu` })}${row({ icon: 'pin', title: 'Sediu', sub: 'Str. Depozitelor 12, Salcea, jud. Suceava' })}${row({ icon: 'mail', title: 'E-mail facturi', sub: 'contabilitate@rarau-freight.ro' })}</div>
   <div class="list">${row({ icon: 'receipt', title: 'Transmitere în e-Factura', sub: 'Factura lunară, emisă până pe 15, ajunge în SPV', right: swc('efact', true, 'e-Factura', true), chev: false })}${row({ icon: 'layers', title: 'Anexă pe centre de cost', sub: 'Lista sesiunilor, CSV', right: swc('anexa', true, 'Anexă centre de cost'), chev: false })}</div>
@@ -2366,6 +2533,9 @@ SCREENS.despre = { tabs: false, html: () => `${topbar('Despre')}<div class="pad 
   <img class="lk-l" src="${LOGO.light}" alt="Termohabitat Fotovoltaice" style="height:30px;width:auto"><img class="lk-d" src="${LOGO.dark}" alt="Termohabitat Fotovoltaice" style="height:30px;width:auto">
   <p class="muted" style="max-width:34ch">Stații de încărcare alimentate de centralele fotovoltaice și bateriile montate de Termohabitat.</p>
   <div class="list" style="width:100%;text-align:left">${row({ icon: 'building', title: DATA.company.name, sub: `CUI ${DATA.company.cui}` })}${row({ icon: 'pin', title: 'Sediu', sub: DATA.company.hq })}${row({ icon: 'shield', title: 'Termeni și confidențialitate', go: 'confidentialitate' })}</div>
+  <details class="list faq" style="width:100%;text-align:left;padding-inline:14px"><summary>Modele 3D și licențe${ic('chevD', 's18')}</summary>
+    <div class="stack" style="gap:8px;margin-top:10px">${[...new Set(Object.values(MODELS3D).map(m => m.credit))].map(c => `<p class="muted" style="font-size:12.5px;margin:0">${esc(c)}</p>`).join('')}
+    <p class="muted" style="font-size:12px;margin:0">Licență CC BY 4.0: creativecommons.org/licenses/by/4.0. Modelele sunt scalate, comprimate și, unde e cazul, fără însemne sau cu altă culoare. Mărcile vehiculelor aparțin proprietarilor lor.</p></div></details>
   <p class="muted" style="font-size:12px;max-width:34ch">Stațiile, prețurile, vehiculele, flota și cardurile din prototip sunt date exemplu. Codul de operator TMH e provizoriu.</p></div>` };
 SCREENS.profil = { tabs: false, html: () => `${topbar('Profil')}<div class="pad stack-l"><div class="field"><label for="pn">Nume</label><input class="input" id="pn" value="${esc(DATA.me.name)}" autocomplete="name"></div><div class="field"><label for="pe">E-mail</label><input class="input" id="pe" type="email" value="${esc(DATA.me.email)}" autocomplete="email"></div><div class="field"><label for="pt">Telefon</label><input class="input" id="pt" type="tel" value="${esc(DATA.me.phone)}" autocomplete="tel"></div><p class="muted" id="pmsg" style="font-size:13px" aria-live="polite"></p><button class="btn btn-primary btn-lg btn-block" data-act="saveProfile">Salvează</button></div>` };
 
@@ -2429,27 +2599,50 @@ function mountMap(el) {
   }
   const zoomAt = (cx, cy, k2) => { k2 = Math.min(2.2, Math.max(0.4, k2)); M.x = cx - (cx - M.x) * k2 / M.k; M.y = cy - (cy - M.y) * k2 / M.k; M.k = k2; clamp(); apply(); };
   MAPCTL.apply = apply; MAPCTL.centerOn = centerOn;
-  MAPCTL.zoom = f => zoomAt(wrap.clientWidth / 2, focusY(), M.k * f);
+  MAPCTL.zoom = f => zoomTo(wrap.clientWidth / 2, focusY(), M.k * f);
   /* gesturi */
-  const ptrs = new Map(); let moved = false, last = null, pinch = null;
-  wrap.addEventListener('pointerdown', e => { ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (ptrs.size === 1) { last = [e.clientX, e.clientY]; moved = false; } if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: M.k }; } });
+  const ptrs = new Map(); let moved = false, last = null, pinch = null, vel = [0, 0], lastT = 0, glide = 0, lastTap = 0;
+  /* după ce ridici degetul, harta mai alunecă puțin și se oprește lin (inerție ca în Hărți) */
+  const stopGlide = () => { if (glide) { cancelAnimationFrame(glide); glide = 0; } };
+  const startGlide = () => {
+    stopGlide(); let [vx, vy] = vel, t0 = performance.now();
+    if (Math.hypot(vx, vy) < 0.25) return;
+    const step = t => { const dt = Math.min(32, t - t0); t0 = t; M.x += vx * dt; M.y += vy * dt; const f = Math.pow(0.994, dt); vx *= f; vy *= f; clamp(); apply(); glide = Math.hypot(vx, vy) > 0.02 ? requestAnimationFrame(step) : 0; };
+    glide = requestAnimationFrame(step);
+  };
+  /* zoom animat (dublă atingere, butoane) */
+  const zoomTo = (cx, cy, k2) => { stopGlide(); const k0 = M.k, x0 = M.x, y0 = M.y; k2 = Math.min(2.2, Math.max(0.4, k2)); const t0 = performance.now();
+    const step = t => { const u = Math.min(1, (t - t0) / 260), e = 1 - Math.pow(1 - u, 3), k = k0 + (k2 - k0) * e; M.x = cx - (cx - x0) * k / k0; M.y = cy - (cy - y0) * k / k0; M.k = k; clamp(); apply(); if (u < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step); };
+  wrap.addEventListener('pointerdown', e => { stopGlide(); ptrs.set(e.pointerId, [e.clientX, e.clientY]); if (ptrs.size === 1) { last = [e.clientX, e.clientY]; moved = false; vel = [0, 0]; lastT = performance.now(); } if (ptrs.size === 2) { const [a, b] = [...ptrs.values()]; pinch = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), k: M.k }; } });
   wrap.addEventListener('pointermove', e => {
     if (!ptrs.has(e.pointerId)) return; ptrs.set(e.pointerId, [e.clientX, e.clientY]);
     if (ptrs.size === 2 && pinch) { const [a, b] = [...ptrs.values()], r = wrap.getBoundingClientRect(); moved = true; zoomAt((a[0] + b[0]) / 2 - r.left, (a[1] + b[1]) / 2 - r.top, pinch.k * Math.hypot(a[0] - b[0], a[1] - b[1]) / pinch.d); return; }
     if (!last) return; const dx = e.clientX - last[0], dy = e.clientY - last[1];
     if (!moved && Math.hypot(dx, dy) < 6) return;
     if (!moved) { moved = true; wrap.classList.add('drag'); try { wrap.setPointerCapture(e.pointerId); } catch (x) { /* ignorat */ } }
+    const now = performance.now(), dt = Math.max(1, now - lastT); vel = [vel[0] * 0.6 + dx / dt * 0.4, vel[1] * 0.6 + dy / dt * 0.4]; lastT = now;
     M.x += dx; M.y += dy; last = [e.clientX, e.clientY]; clamp(); apply();
   });
-  const end = e => { ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null; if (!ptrs.size) { last = null; wrap.classList.remove('drag'); setTimeout(() => { moved = false; }, 0); } };
+  const end = e => {
+    const wasPinch = !!pinch; ptrs.delete(e.pointerId); if (ptrs.size < 2) pinch = null;
+    if (!ptrs.size) {
+      last = null; wrap.classList.remove('drag');
+      if (moved && !wasPinch && performance.now() - lastT < 80) startGlide();
+      /* dublă atingere pe hartă (nu pe un pin): mărește în jurul degetului */
+      if (!moved && e.type === 'pointerup' && !e.target.closest('.pin')) { const t = performance.now(), r = wrap.getBoundingClientRect(); if (t - lastTap < 300) { zoomTo(e.clientX - r.left, e.clientY - r.top, M.k * 1.6); lastTap = 0; } else lastTap = t; }
+      setTimeout(() => { moved = false; }, 0);
+    }
+  };
   wrap.addEventListener('pointerup', end); wrap.addEventListener('pointercancel', end);
   wrap.addEventListener('wheel', e => { e.preventDefault(); const r = wrap.getBoundingClientRect(); zoomAt(e.clientX - r.left, e.clientY - r.top, M.k * (e.deltaY < 0 ? 1.12 : 0.89)); }, { passive: false });
   /* foaia de jos: trei poziții */
-  const H = () => { const vh = wrap.clientHeight, tb = ($('#tabbar') && $('#tabbar').offsetHeight) || 70; return { mini: tb + 140, peek: Math.round(vh * 0.45), full: vh - (topInset() + 56) }; };
+  const tabH = () => { const t = $('#tabbar'); if (!t || t.hidden) return 70; return Math.max(0, wrap.getBoundingClientRect().bottom - t.getBoundingClientRect().top); };
+  const H = () => { const vh = wrap.clientHeight; return { mini: tabH() + 132, peek: Math.round(vh * 0.45), full: vh - (topInset() + 56) }; };
   const setSheet = (state, animate = true) => {
     S.sheet = state; const h = H()[state]; hs.style.transition = animate ? '' : 'none'; hs.style.height = h + 'px';
     ctrl.style.bottom = (h + 12) + 'px'; legend.style.bottom = (h + 14) + 'px';
-    const full = state === 'full'; ctrl.style.opacity = full ? '0' : '1'; ctrl.style.pointerEvents = full ? 'none' : ''; ctrl.inert = full;
+    const full = state === 'full'; ctrl.style.opacity = full ? '0' : '1'; ctrl.style.pointerEvents = full ? 'none' : ''; ctrl.inert = full; legend.style.opacity = full ? '0' : '';
     grip.setAttribute('aria-expanded', String(full)); apply();
   };
   MAPCTL.setSheet = setSheet;
@@ -2528,6 +2721,16 @@ const ACT = {
   zout: () => MAPCTL.zoom && MAPCTL.zoom(1 / 1.3),
   fav: el => { const id = el.dataset.id; if (S.favs.has(id)) S.favs.delete(id); else S.favs.add(id); store.set('favs', [...S.favs]); toast(S.favs.has(id) ? 'Adăugată la favorite' : 'Scoasă de la favorite', S.favs.has(id) ? 'starF' : 'star'); rerender(); },
   share: el => { const st = station(el.dataset.id); copyText(`${st.name}, ${st.addr}, ${st.city}`, 'Adresa stației e copiată'); },
+  /* navigație: alegi aplicația de pe telefon; linkurile deschid direct Hărți, Google Maps sau Waze */
+  nav: el => {
+    const st = station(el.dataset.id), q = encodeURIComponent(st.q);
+    const apps = [['Apple Hărți', 'map', 'blue', `https://maps.apple.com/?daddr=${q}&dirflg=d`], ['Google Maps', 'nav', 'green', `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=driving`], ['Waze', 'route', 'teal', `https://waze.com/ul?q=${q}&navigate=yes`]];
+    openModal(`<div class="stack"><div><div class="eyebrow">${nf(distKm(st), 1)}${NB}km · ~${dur(etaMin(st))}</div><h3>Navighează la ${esc(st.name)}</h3><p class="muted" style="font-size:13.5px;margin-top:2px">${esc(st.addr)}, ${esc(st.city)}</p></div>
+      <div class="list">${apps.map(([n, i, c, u]) => `<a class="row" href="${u}" target="_blank" rel="noopener" style="text-decoration:none"><span class="tile" style="background:var(--t-${c})">${ic(i, 's20')}</span><span class="grow"><span class="r-title">${n}</span></span><span class="faint">${ic('chevR', 's18')}</span></a>`).join('')}</div>
+      ${isTruckSt(st) ? `<div class="note">${ic('truck')}<span>Cu camionul, folosește navigația cu profil de camion: intrarea în hub e pe DN2, cu bandă de ${st.truck.lane || 4}${NB}m și înălțime liberă ${nf(st.truck.height, 1)}${NB}m.</span></div>` : ''}
+      <button class="btn btn-ghost btn-block" data-act="closeModal">Renunță</button></div>`,
+      m => m.querySelectorAll('a.row').forEach(a => a.addEventListener('click', () => setTimeout(() => closeModal(false), 200))));
+  },
   reserve: el => {
     const st = station(el.dataset.id), top = curTop(), sel = top.p.conn && conn(st, top.p.conn);
     const c = sel && sel.status === 'free' ? sel : st.conns.find(x => x.status === 'free' && myVehicles().some(v => fitsConn(v, x)));
@@ -2638,7 +2841,9 @@ document.addEventListener('click', e => {
   if (t.dataset.seg) return segChange(t);
   if (t.dataset.back != null) return back();
   if (t.dataset.tab) {
-    if (t.dataset.tab === S.tab && S.stack.length === 1) { const el = curScr(); if (el) el.scrollTo({ top: 0, behavior: 'smooth' }); if (S.tab === 'harta' && MAPCTL.setSheet) { MAPCTL.setSheet('peek'); const hb = $('#hsbody'); if (hb) hb.scrollTop = 0; } return; }
+    /* a doua atingere pe tabul curent: întâi înapoi la ecranul principal al tabului, apoi sus */
+    if (t.dataset.tab === S.tab && S.stack.length > 1) { S.stack = [S.stack[0]]; render('pop'); return; }
+    if (t.dataset.tab === S.tab) { const el = curScr(); if (el) el.scrollTo({ top: 0, behavior: 'smooth' }); if (S.tab === 'harta' && MAPCTL.setSheet) { MAPCTL.setSheet('peek'); const hb = $('#hsbody'); if (hb) hb.scrollTo({ top: 0, behavior: 'smooth' }); } return; }
     return tabTo(t.dataset.tab);
   }
   if (t.dataset.go) { closeModal(false); return go(t.dataset.go, t.dataset.id ? { id: t.dataset.id } : {}); }
@@ -2727,6 +2932,7 @@ function tick() {
   if (route === 'statie') { const st = station(curTop().p.id); if (!someNoSignal(st).length) { const sec = Math.round((Date.now() - S.shownAt) / 1000) % 30; set('updated', `Starea punctelor: actualizată acum ${sec < 5 ? 'câteva secunde' : sec + NB + 's'}`); } }
   if (route === 'flota') DATA.vehicles.forEach(v => { const st = vehStatus(v); if (!st.live) return; const kw = el.querySelector(`[data-live="fkw-${v.id}"]`), soc = el.querySelector(`[data-live="fsoc-${v.id}"]`); if (kw) kw.textContent = Math.round(st.kw); if (soc) soc.style.width = st.soc + '%'; });
   if (!$('#livepill').hidden) livePill();
+  islandRender();
 }
 function statusClock() { const t = $('#sbtime'); if (t) t.textContent = hhmm(new Date()); }
 
@@ -2739,7 +2945,7 @@ const RAIL_SCREENS = [
 function railGo(k) {
   closeModal(false);
   const tabs = { harta: 1, activitate: 1, scan: 1, flota: 1, cont: 1 };
-  if (tabs[k]) return tabTo(k);
+  if (tabs[k]) return tabTo(k, true);
   if (k === 'bunvenit') return replaceTo([{ r: 'bunvenit', p: {} }], 'harta');
   if (k === 'statie') return replaceTo([{ r: 'harta', p: {} }, { r: 'statie', p: { id: 'scheia' } }], 'harta');
   if (k === 'statieTir') return replaceTo([{ r: 'harta', p: {} }, { r: 'statie', p: { id: 'tir' } }], 'harta');
@@ -2784,6 +2990,19 @@ function boot() {
     + `<button class="tab-scan" data-tab="scan" aria-label="Scanează și încarcă"><span class="fab">${ic('qr')}</span><span class="lbl">Scanează</span></button>`
     + [['flota', 'Flotă', 'fleet'], ['cont', 'Cont', 'user']].map(([k, l, i]) => `<button class="tab" data-tab="${k}">${ic(i)}<span>${l}</span></button>`).join('');
   $('#livepill').addEventListener('click', () => go('sesiune'));
+  const sh = document.createElement('div'); sh.className = 'sbshade'; sh.id = 'sbshade'; sh.setAttribute('aria-hidden', 'true'); $('#app').appendChild(sh);
+  view().addEventListener('scroll', e => { if (e.target === curScr()) shadeUpdate(); }, { capture: true, passive: true });
+  /* pe iPhone, :active (animația de apăsare) cere un ascultător touchstart; ciupitul nu mărește toată aplicația */
+  document.addEventListener('touchstart', () => {}, { passive: true });
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  /* undă de la locul atingerii pe butoanele mari */
+  document.addEventListener('pointerdown', e => {
+    const b = e.target.closest('.btn,.opt,.conn,.srow,.dx-row button'); if (!b || b.disabled) return;
+    const r = b.getBoundingClientRect(), d = Math.hypot(r.width, r.height) * 2, f = document.createElement('span');
+    f.className = 'tapfx'; f.style.cssText = `left:${e.clientX - r.left}px;top:${e.clientY - r.top}px;width:${d}px;height:${d}px`;
+    if (getComputedStyle(b).position === 'static') b.style.position = 'relative';
+    b.style.overflow = 'hidden'; b.appendChild(f); setTimeout(() => f.remove(), 600);
+  }, { passive: true });
   const h = (location.hash || '').slice(1);
   render('fade');
   if (h && RAIL_SCREENS.some(r => r[0] === h)) railGo(h);
@@ -2801,6 +3020,77 @@ function boot() {
   let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { renderRail(); const el = curScr(); if (MAPCTL.setSheet && el && el.dataset.route === 'harta') MAPCTL.setSheet(S.sheet, false); }, 120); });
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+
+/* ============================================================
+   06 · „Insula dinamică” în aplicație
+   O aplicație web nu poate scrie în Dynamic Island când e în fundal (acolo apar doar
+   Live Activities ale aplicațiilor native). Cât aplicația e deschisă, desenăm o capsulă
+   neagră lipită de insula fizică: negru pe negru, deci pare că insula se lărgește.
+   ============================================================ */
+const ISL = { state: 'hidden', timer: 0, lastDone: false, forced: /(^|[?&#])insula\b/.test(location.search + location.hash) };
+/* geometria insulei: rama de pe desktop sau iPhone-ul real (zona sigură de sus ≥ 50 pt = are Dynamic Island) */
+function islandGeom() {
+  const dev = $('.device'), frame = window.innerWidth >= 980;
+  if (frame) return { top: 11, w: 122, h: 35 };
+  const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  const sat = topInset();
+  if ((standalone || ISL.forced) && sat >= 50) return { top: Math.max(8, sat / 2 - 18.5), w: 126, h: 37 };
+  if (ISL.forced) return { top: 11, w: 126, h: 37 };
+  return null;
+}
+function islandSet(state, hold) {
+  const d = $('#dyn'); if (!d) return;
+  clearTimeout(ISL.timer);
+  ISL.state = state;
+  d.classList.toggle('compact', state === 'compact');
+  d.classList.toggle('expanded', state === 'expanded');
+  if (state === 'expanded' && hold) ISL.timer = setTimeout(() => islandSet('compact'), hold);
+}
+function islandPulse() { const d = $('#dyn'); if (!d) return; d.classList.remove('pulse'); void d.offsetWidth; d.classList.add('pulse'); }
+function islandRender() {
+  const d = $('#dyn'); if (!d) return;
+  const s = S.session, top = curTop(), g = islandGeom();
+  const route = top && top.r; if (route !== ISL.route) { ISL.prevRoute = ISL.route; ISL.route = route; }
+  const show = !!s && !!g && top && top.r !== 'sesiune';
+  if (!show) { if (!d.hidden) { islandSet('hidden'); d.hidden = true; } return; }
+  if (d.hidden) {
+    d.hidden = false; d.style.setProperty('--dyn-top', g.top + 'px'); d.style.setProperty('--dyn-w', g.w + 'px'); d.style.setProperty('--dyn-h', g.h + 'px');
+    /* ieșirea din ecranul de încărcare „intră” în insulă: se lărgește cu un puls, fără să acopere ecranul */
+    const fromSession = ISL.prevRoute === 'sesiune';
+    requestAnimationFrame(() => { islandSet('compact'); if (fromSession) islandPulse(); });
+  }
+  const v = vehicle(s.veh), st = station(s.st), fee = s.done && idleLeft(s) <= 0;
+  d.classList.toggle('done', s.done && !fee); d.classList.toggle('fee', fee);
+  const soc = Math.floor(s.soc), C = 2 * Math.PI * 7.4;
+  const col = fee ? '#FFB547' : s.done ? '#6FA8FF' : '#8BE04E';
+  const L = d.querySelector('.dyn-l'), Rr = d.querySelector('.dyn-r'), icon = s.done ? 'checkCircle' : 'boltF';
+  if (L.dataset.ic !== icon) { L.dataset.ic = icon; L.innerHTML = `<span class="mini"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.4" stroke="#2A302A"/><circle class="mv" cx="9" cy="9" r="7.4" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" style="transition:stroke-dashoffset .8s ease"/></svg>${ic(icon)}</span>`; }
+  const mv = L.querySelector('.mv'); mv.setAttribute('stroke', col); mv.setAttribute('stroke-dashoffset', (C * (1 - s.soc / 100)).toFixed(1));
+  if (Rr.textContent !== soc + '%') Rr.textContent = soc + '%';
+  const pic = ic(VKIND[v.kind][0]) + (v.model3d ? `<img src="${window.ASSET_BASE || ''}img/veh-${v.model3d}.png" alt="" onerror="this.remove()">` : '');
+  const sub = s.done ? (fee ? `Taxă de ocupare ${lei(idleFee(s))}` : idleLeft(s) === Infinity ? 'Încărcare completă' : `Gratuit încă ${clock(idleLeft(s))}`) : etaLine(s).replace(/^Până la \d+%: /, '');
+  const x = d.querySelector('#dynX');
+  /* prima dată construim structura; apoi schimbăm doar valorile, ca bara să curgă lin și butonul să nu se refacă */
+  if (!x.firstElementChild) x.innerHTML = `<span class="dx-pic"></span><span class="dx-soc"><b></b><span></span></span><span class="dx-mid"><span class="dx-kw"></span><span class="dx-t"></span></span>
+    <span class="dx-bar"><span class="dx-track"><i></i></span><span class="dx-row"><span class="dx-sub"></span><button type="button" data-dyn="open">Deschide</button></span></span>`;
+  const put = (sel, html) => { const n = x.querySelector(sel); if (n.innerHTML !== html) n.innerHTML = html; };
+  if (x.dataset.veh !== v.id) { x.dataset.veh = v.id; put('.dx-pic', pic); }
+  put('.dx-soc b', soc + '%'); put('.dx-soc span', 'țintă ' + s.target + '%');
+  put('.dx-kw', s.done ? 'Gata' : `${nf(s.kw, 1)}<small>kW</small>`); put('.dx-t', `${esc(v.name)} · ${esc(st.city)}`);
+  put('.dx-sub', `${sub} · ${lei(sessTotal(s))}`); x.querySelector('.dx-track i').style.width = s.soc + '%';
+  if (s.done && !ISL.lastDone) { islandPulse(); islandSet('expanded', 5000); }
+  ISL.lastDone = s.done;
+}
+document.addEventListener('click', e => {
+  const d = $('#dyn'); if (!d || d.hidden) return;
+  if (e.target.closest('[data-dyn="open"]')) { e.stopPropagation(); islandSet('compact'); go('sesiune'); return; }
+  if (e.target.closest('#dynC')) { islandSet('expanded', 6000); return; }
+  if (e.target.closest('#dynX')) { islandSet('compact'); return; }
+  if (ISL.state === 'expanded' && !e.target.closest('#dyn')) islandSet('compact');
+}, true);
+/* la revenirea în aplicație: insula se deschide scurt, ca să vezi unde a ajuns încărcarea */
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && S.session && !$('#dyn').hidden) { islandPulse(); islandSet('expanded', 3500); } });
+function islandOnStart() { ISL.lastDone = false; setTimeout(() => { islandRender(); if (!$('#dyn').hidden) { islandPulse(); islandSet('expanded', 3500); } }, 420); }
 
 </script>
 <script type="module" src="js/car3d.js"></script>
